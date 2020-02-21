@@ -1,0 +1,99 @@
+class HTree:
+    def __init__(self, history):
+        self.history = history
+        self.roots_list = None
+        self.leaves_list = None
+
+    def match(self, idprefix):
+        results = []
+        for j, _ in self.history.items():
+            if j.startswith(idprefix):
+                results.append(j)
+        if not results:
+            raise ValueError("Job id prefix matches no job")
+        if len(results) > 1:
+            raise ValueError("Job id prefix matches multiple jobs")
+        return results[0]
+
+    def parent(self, jobid, n=1):
+        """
+
+        :param jobid:
+        :param n: n<=0 for the ultimate root
+        :return:
+        """
+        p1 = self.history[jobid]["prev"]
+        # print(p1)
+        if p1 is None:
+            if n > 0:
+                return
+                # raise ValueError("%s has no parent in that level" % jobid)
+            else:
+                return jobid
+        if n == 1:
+            return p1
+        return self.parent(p1, n - 1)
+
+    def roots(self):
+        if self.roots_list is not None:
+            return self.roots_list
+        r = []
+        for jid, s in self.history.items():
+            if s["prev"] is None:
+                r.append(jid)
+        self.roots_list = r
+        return r
+
+    def root(self, jobid):
+        return self.parent(jobid, n=0)
+
+    def children(self, jobid, n=1):
+        """
+
+        :param jobid: jobid or jobids list
+        :param n: n=0 for the lowest level
+        :return: list of children jobid
+        """
+        c1s = []
+        if type(jobid) is not list:
+            jobid = [jobid]
+        for j in jobid:
+            c1 = self.history[j]["next"]
+            if c1:
+                c1s.extend(c1)
+        if n == 1:
+            return c1s
+        if not c1s and n <= 0:
+            return jobid
+        return self.children(c1s, n - 1)
+
+    def end(self, jobid):
+        """
+        downstream of jobid as leaves
+
+        :param jobid:
+        :return: list
+        """
+        r = []
+        for node in self.DFSvisit(jobid):
+            if not self.history[node]["next"]:
+                r.append(node)
+        return r
+
+    def DFSvisit(self, jobid):
+        yield jobid
+        for nid in self.history[jobid]["next"]:
+            yield from self.DFSvisit(nid)
+
+    def BFSvisit(self, jobid):
+        pass
+
+    def leaves(self):
+        if self.leaves_list is not None:
+            return self.leaves_list
+        l = []
+        for jid, s in self.history.items():
+            if not s["next"]:
+                l.append(jid)
+        self.leaves_list = l
+        return l

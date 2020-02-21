@@ -1,0 +1,10 @@
+dev*
+.pytest_cache
+subway/templates
+*.pyc
+.idea
+.DS_Store
+build
+dist
+*.egg-info
+__pycache__

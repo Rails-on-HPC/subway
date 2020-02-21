@@ -1,0 +1,4 @@
+- [ ] absorted state and absorting_ts for tasks in history.json
+- [ ] make check job under control of the same submit system
+- [ ] good abstraction on resource management
+- [ ] slurm plugin for check and submit
