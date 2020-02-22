@@ -84,17 +84,26 @@ class SubwayCLI:
         jobid = match[0]
         print("matched job id is %s" % jobid, file=sys.stderr)
         if self.args.action == "input":
-            with open(
-                os.path.join(self.args.dir, self.conf["inputs_dir"], jobid), "r"
-            ) as f:
-                content = f.readlines()
-            print("".join(content))
+            inputpath = os.path.join(
+                self.args.dir, self.conf.get("inputs_dir", ""), jobid
+            )
+            if os.path.exists(inputpath):
+                with open(inputpath, "r") as f:
+                    content = f.readlines()
+                print("".join(content))
+            else:
+                print("no input files for %s" % jobid, file=sys.stderr)
         elif self.args.action == "output":
-            with open(
-                os.path.join(self.args.dir, self.conf["outputs_dir"], jobid), "r"
-            ) as f:
-                content = f.readlines()
-            print("".join(content))
+            outputpath = os.path.join(
+                self.args.dir, self.conf.get("outputs_dir", ""), jobid
+            )
+            if os.path.exists(outputpath):
+                with open(outputpath, "r") as f:
+                    content = f.readlines()
+                print("".join(content))
+            else:
+                print("no output files for %s" % jobid, file=sys.stderr)
+
         elif self.args.action == "info":
             print(json.dumps(self.history[jobid], indent=2))
         elif self.args.action == "origin":

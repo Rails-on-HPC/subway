@@ -52,3 +52,5 @@ def test_dfs():
 
     for i, r in enumerate(h.DFSvisit("fe689376-53c7-11ea-aa97-34363bc66daa")):
         assert r == dfslist[i]
+
+    h.print_tree(h.roots()[0], _show=6)

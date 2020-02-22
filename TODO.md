@@ -2,3 +2,5 @@
 - [ ] make check job under control of the same submit system
 - [ ] good abstraction on resource management
 - [ ] slurm plugin for check and submit
+- [ ] add mechanism that one can manually add job naturally
+- [ ] exit of main if all jobs are checked

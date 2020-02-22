@@ -1,3 +1,8 @@
+"""
+forest of many trees of tasks
+"""
+
+
 class HTree:
     def __init__(self, history):
         self.history = history
@@ -97,3 +102,22 @@ class HTree:
                 l.append(jid)
         self.leaves_list = l
         return l
+
+    def print_tree(self, jobid, file=None, _prefix="", _last=True, _show=0):
+        print(
+            _prefix,
+            "`- " if _last else "|- ",
+            jobid if _show == 0 else jobid[:_show],
+            sep="",
+            file=file,
+        )
+        _prefix += "   " if _last else "|  "
+        children = self.history[jobid]["next"]
+        child_count = len(children)
+        for i, child in enumerate(children):
+            _last = i == (child_count - 1)
+            self.print_tree(child, file, _prefix, _last, _show)
+
+    def print_trees(self, jobids, file=None, _prefix="", _last=True, _show=0):
+        for jobid in jobids:
+            self.print_tree(jobid, file, _prefix, _last, _show)
