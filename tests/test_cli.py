@@ -28,4 +28,4 @@ def test_query(capsys):
     cl = SubwayCLI(_argv=argv)
     cl()
     captured = capsys.readouterr()
-    assert captured.out == "2fc840de-53c7-11ea-8f52-34363bc66daa"+"\n"
+    assert captured.out == "2fc840de-53c7-11ea-8f52-34363bc66daa" + "\n"

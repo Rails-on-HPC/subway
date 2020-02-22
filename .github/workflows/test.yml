@@ -19,4 +19,4 @@ jobs:
           black subway tests setup.py --check
       - name: test scripts
         run: |
-		  pytest tests -vv
+          pytest tests -vv
