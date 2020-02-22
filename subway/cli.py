@@ -184,6 +184,7 @@ class SubwayCLI:
         :param key:
         :return:
         """
+
         def f(s):
             if s.jid:
                 print("1" if self.history[self.jid]["state"] == key else "0")
