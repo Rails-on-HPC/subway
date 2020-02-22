@@ -6,6 +6,6 @@ binpath = os.path.dirname(subpypath)
 subwaypath = os.path.dirname(binpath)
 sys.path.insert(0, subwaypath)
 
-from subway import cli
+from subway import entry
 
-cli.cli()
+entry.cli()

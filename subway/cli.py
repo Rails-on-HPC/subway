@@ -6,14 +6,15 @@ import argparse  # click might be better, but as hpc app, we try our best to onl
 import os
 import sys
 import json
+from functools import partial
 
 from .bootstrap import env_init
-from .utils import load_json
+from .utils import load_json, editor, print_json
 from .htree import HTree
 
 
 class SubwayCLI:
-    def __init__(self):
+    def __init__(self, _argv=None):
         parser = argparse.ArgumentParser(description="subway is comming...")
         parser.add_argument(
             "-d", "--directory", dest="dir", default=os.getcwd(), help="project dir"
@@ -32,14 +33,33 @@ class SubwayCLI:
         queryparser = subparsers.add_parser(
             "query", description="query information on jobs"
         )
-        queryparser.add_argument(dest="path", help="the task investigated")
+        queryparser.add_argument(
+            "-j", "--job", dest="path", default=None, help="the task investigated"
+        )
         queryparser.add_argument(dest="action", help="query action for task")
-
+        configparser = subparsers.add_parser("config", description="config subway")
+        configparser.add_argument(dest="action", help="action on config")
         self.parser = parser
-        self.args = parser.parse_args(sys.argv[1:])
+        if not _argv:
+            _argv = sys.argv[1:]
+        self.args = parser.parse_args(_argv)
         self.conf = load_json(os.path.join(self.args.dir, ".subway", "config.json"))
         self.history = load_json(os.path.join(self.args.dir, ".subway", "history.json"))
         self.tree = None
+
+        for k in [
+            "pending",
+            "running",
+            "finished",
+            "aborted",
+            "checking",
+            "resolving",
+            "checked",
+            "frustrated",
+            "failed",
+            "resolved",
+        ]:
+            self._meta_query_key(k)
 
     def __call__(self):
         getattr(self, self.args.command, "help")()
@@ -66,55 +86,124 @@ class SubwayCLI:
     def query(self):
         if not self.tree:
             self.tree = HTree(self.history)
-        match = []
-        path = self.args.path
-        for jobid, _ in self.history.items():
-            if jobid.startswith(path):
-                match.append(jobid)
+        self.jid = self.args.path
+        if self.jid:
+            self.jid = self.tree.match(self.jid)
+            # print(self.jid)
+            print("matched job id is %s" % self.jid, file=sys.stderr)
+        return getattr(self, "query_" + self.args.action, "query_info")()
 
-        if not match:
-            print("no matched task, please recheck the job id", file=sys.stderr)
-            return
-        elif len(match) > 1:
-            print(
-                "cannot determine unique jobid, please give longer job id sequence",
-                file=sys.stderr,
-            )
-            return
-        jobid = match[0]
-        print("matched job id is %s" % jobid, file=sys.stderr)
-        if self.args.action == "input":
+    def query_info(self):
+        if self.jid:
+            print_json(self.history[self.jid])
+        else:
+            print_json(self.history)
+
+    def query_tree(self):
+        if self.jid:
+            self.tree.print_tree(self.jid)
+        else:
+            self.tree.print_trees(self.tree.roots())
+
+    def query_input(self):
+        if self.jid:
             inputpath = os.path.join(
-                self.args.dir, self.conf.get("inputs_dir", ""), jobid
+                self.args.dir, self.conf.get("inputs_dir", ""), self.jid
             )
             if os.path.exists(inputpath):
                 with open(inputpath, "r") as f:
                     content = f.readlines()
                 print("".join(content))
             else:
-                print("no input files for %s" % jobid, file=sys.stderr)
-        elif self.args.action == "output":
+                print("no input files for %s" % self.jid, file=sys.stderr)
+        else:
+            self._noid()
+
+    def query_output(self):
+        if self.jid:
             outputpath = os.path.join(
-                self.args.dir, self.conf.get("outputs_dir", ""), jobid
+                self.args.dir, self.conf.get("outputs_dir", ""), self.jid
             )
             if os.path.exists(outputpath):
                 with open(outputpath, "r") as f:
                     content = f.readlines()
                 print("".join(content))
             else:
-                print("no output files for %s" % jobid, file=sys.stderr)
-
-        elif self.args.action == "info":
-            print(json.dumps(self.history[jobid], indent=2))
-        elif self.args.action == "origin":
-            print(self.tree.root(jobid))
-        elif self.args.action == "end":
-            print(self.tree.end(jobid))
+                print("no output files for %s" % self.jid, file=sys.stderr)
         else:
-            print(self.history[jobid][self.args.action])
+            self._noid()
+
+    def query_root(self):
+        if self.jid:
+            print(self.tree.root(self.jid))
+        else:
+            print(*self.tree.roots(), sep="\n")
+
+    def query_next(self):
+        if self.jid:
+            n = self.history[self.jid]["next"]
+            print(*n, sep="\n")
+        else:
+            self._noid()
+
+    def query_prev(self):
+        if self.jid:
+            p = self.history[self.jid]["prev"]
+            print(p)
+        else:
+            self._noid()
+
+    def query_leaves(self):
+        if self.jid:
+            print(*self.tree.end(self.jid), sep="\n")
+        else:
+            print(*self.tree.leaves(), sep="\n")
+
+    def query_state(self):
+        if self.jid:
+            print(self.history[self.jid]["state"])
+        else:
+            s = set()
+            for _, st in self.history.items():
+                s.add(st["state"])
+            print(*s, sep="\n")
+
+    def _meta_query_key(self, key):
+        """
+        meta function to generate member function for this class, generate function as follows
+        # def query_checked(self):
+        #     if self.jid:
+        #         print("1" if self.history[self.jid]['state'] == "checked" else "0")
+        #     else:
+        #         r = []
+        #         for j, s in self.history.items():
+        #             if s['state'] == "checked":
+        #                 r.append(j)
+        #         print(*r, sep="\n")
+
+        :param key:
+        :return:
+        """
+        def f(s):
+            if s.jid:
+                print("1" if self.history[self.jid]["state"] == key else "0")
+            else:
+                r = []
+                for j, d in s.history.items():
+                    if d["state"] == key:
+                        r.append(j)
+                print(*r, sep="\n")
+
+        setattr(self, "query_" + key, partial(f, self))
+
+    def config(self):
+        if self.args.action == "show":
+            print_json(self.conf)
+        elif self.args.action == "edit":
+            editor(os.path.join(self.args.dir, ".subway", "config.json"))
 
     def help(self):
         self.parser.print_help()
 
-
-cli = SubwayCLI()
+    def _noid(self):
+        print("please specify job id", file=sys.stderr)

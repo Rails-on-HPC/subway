@@ -8,5 +8,5 @@ if __name__ == "__main__":
         name="subway",
         version=version,
         packages=["subway"],
-        entry_points={"console_scripts": ["subway = subway.cli:cli"]},
+        entry_points={"console_scripts": ["subway = subway.entry:cli"]},
     )
