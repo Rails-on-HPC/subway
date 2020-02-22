@@ -1,6 +1,7 @@
 """
 forest of many trees of tasks
 """
+from .exceptions import MatchError
 
 
 class HTree:
@@ -15,9 +16,9 @@ class HTree:
             if j.startswith(idprefix):
                 results.append(j)
         if not results:
-            raise ValueError("Job id prefix matches no job")
+            raise MatchError("Job id prefix matches no job")
         if len(results) > 1:
-            raise ValueError("Job id prefix matches multiple jobs")
+            raise MatchError("Job id prefix matches multiple jobs")
         return results[0]
 
     def parent(self, jobid, n=1):

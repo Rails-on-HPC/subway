@@ -27,8 +27,7 @@
   "4b275a36-53c7-11ea-92bd-34363bc66daa": {
     "state": "checked",
     "prev": "336b38e2-53c7-11ea-ad00-34363bc66daa",
-    "next": [
-    ],
+    "next": [],
     "creating_ts": 1582192601.28482,
     "resource": {},
     "beginning_ts": 1582192761.978852,
@@ -64,8 +63,7 @@
   "f722f0ca-53c7-11ea-a2f8-34363bc66daa": {
     "state": "checked",
     "prev": "cd7ea6ba-53c7-11ea-9396-34363bc66daa",
-    "next": [
-    ],
+    "next": [],
     "creating_ts": 1582192889.821794,
     "resource": {},
     "beginning_ts": 1582192892.923602,
@@ -75,8 +73,7 @@
   "fac8e892-53c7-11ea-9087-34363bc66daa": {
     "state": "checked",
     "prev": "cd7ea6ba-53c7-11ea-9396-34363bc66daa",
-    "next": [
-    ],
+    "next": [],
     "creating_ts": 1582192895.929548,
     "resource": {},
     "beginning_ts": 1582192899.002213,
@@ -123,8 +120,7 @@
   "094816fe-53c8-11ea-885f-34363bc66daa": {
     "state": "checked",
     "prev": "05a83858-53c8-11ea-9091-34363bc66daa",
-    "next": [
-    ],
+    "next": [],
     "creating_ts": 1582192920.251294,
     "resource": {},
     "beginning_ts": 1582192923.33205,
@@ -156,10 +152,9 @@
     "checking_ts": 1582192938.503899
   },
   "14293906-53c8-11ea-b8c1-34363bc66daa": {
-    "state": "checked",
+    "state": "pending",
     "prev": "1089b602-53c8-11ea-bf63-34363bc66daa",
-    "next": [
-    ],
+    "next": [],
     "creating_ts": 1582192938.503914,
     "resource": {},
     "beginning_ts": 1582192941.58496,

@@ -166,12 +166,15 @@ class PlainChk(Checker):
         :param jobid: relativepath
         :return:
         """
-        output_fs = [
-            f
-            for f in os.listdir(conf["outputs_abs_dir"])
-            if os.path.isfile(os.path.join(conf["outputs_abs_dir"], f))
-        ]
-        return jobid in output_fs
+        outputs_abs_dir = conf["outputs_abs_dir"]
+        if os.path.exists(outputs_abs_dir):
+            output_fs = [
+                f
+                for f in os.listdir(outputs_abs_dir)
+                if os.path.isfile(os.path.join(conf["outputs_abs_dir"], f))
+            ]
+            return jobid in output_fs
+        return True
 
     def is_aborted(self, jobid):
         return False

@@ -20,11 +20,13 @@ def main_once(
     submitter()
 
 
-def main_rt(checker, submitter, sleep_interval=10):
+def main_rt(checker, submitter, sleep_interval=10, loops=None):
     # TODO: realtime always-on monitor version of main
     # naive version
-    while True:
+    i = 0
+    while (not loops) or (i < loops):
         checker()
         time.sleep(sleep_interval)
         submitter()
         time.sleep(sleep_interval)
+        i += 1

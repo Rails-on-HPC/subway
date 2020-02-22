@@ -5,7 +5,7 @@ class DebugChk(PlainChk):
     def __init__(self, is_next=False):
         self.is_next = is_next
 
-    def check_output(self, outputpath):
+    def check_checking(self, outputpath):
         print("the output path to be checked is %s" % outputpath)
         if self.is_next is True:
             from uuid import uuid1
@@ -15,6 +15,6 @@ class DebugChk(PlainChk):
 
 
 class DebugSub(PlainSub):
-    def submit_job(self, inputpath):
+    def submit_pending(self, inputpath):
         print("the input path to be submitted as job is %s" % inputpath)
         return

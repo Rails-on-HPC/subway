@@ -11,6 +11,7 @@ from functools import partial
 from .bootstrap import env_init
 from .utils import load_json, editor, print_json
 from .htree import HTree
+from .exceptions import CLIException
 
 
 class SubwayCLI:
@@ -62,7 +63,11 @@ class SubwayCLI:
             self._meta_query_key(k)
 
     def __call__(self):
-        getattr(self, self.args.command, "help")()
+        try:
+            getattr(self, self.args.command, "help")()
+        except CLIException as e:
+            print(e.message, file=sys.stderr)
+            exit(e.code)
 
     def init(self):
 
@@ -115,7 +120,7 @@ class SubwayCLI:
                     content = f.readlines()
                 print("".join(content))
             else:
-                print("no input files for %s" % self.jid, file=sys.stderr)
+                raise CLIException("no input files for %s" % self.jid)
         else:
             self._noid()
 
@@ -129,7 +134,7 @@ class SubwayCLI:
                     content = f.readlines()
                 print("".join(content))
             else:
-                print("no output files for %s" % self.jid, file=sys.stderr)
+                raise CLIException("no output files for %s" % self.jid)
         else:
             self._noid()
 
@@ -207,4 +212,4 @@ class SubwayCLI:
         self.parser.print_help()
 
     def _noid(self):
-        print("please specify job id", file=sys.stderr)
+        raise CLIException("Please specify job id", code=12)
