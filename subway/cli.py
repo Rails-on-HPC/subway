@@ -22,17 +22,23 @@ class SubwayCLI:
         )
         subparsers = parser.add_subparsers(dest="command")
         # init params
-        initparser = subparsers.add_parser("init", description="init subway project")
+        initparser = subparsers.add_parser(
+            "init", aliases="i", description="init subway project"
+        )
         initparser.add_argument(
             "-c", "--config", dest="conf", default=None, help="config.json path"
         )
         # help params
-        helpparser = subparsers.add_parser("help", description="help on subway")
+        helpparser = subparsers.add_parser(
+            "help", aliases="h", description="help on subway"
+        )
         # run params
-        runparser = subparsers.add_parser("run", description="check and submit jobs")
+        runparser = subparsers.add_parser(
+            "run", aliases="r", description="check and submit jobs"
+        )
         # query params
         queryparser = subparsers.add_parser(
-            "query", description="query information on jobs"
+            "query", aliases="q", description="query information on jobs"
         )
         queryparser.add_argument(
             "-j", "--job", dest="path", default=None, help="the task investigated"
@@ -40,6 +46,11 @@ class SubwayCLI:
         queryparser.add_argument(dest="action", help="query action for task")
         configparser = subparsers.add_parser("config", description="config subway")
         configparser.add_argument(dest="action", help="action on config")
+        debugparser = subparsers.add_parser(
+            "debug", aliases="d", description="debug related commands"
+        )
+        debugparser.add_argument(dest="object", help="object for debug")
+        debugparser.add_argument(dest="action", help="action for debug")
         # TODO: automatic way to add help for subparser, eg. decorator of query funcs
         # TODO: plugable subcommands, eg slurm
         self.parser = parser
@@ -104,10 +115,14 @@ class SubwayCLI:
             "the subway project has been successfully initialized in %s" % self.args.dir
         )
 
+    i = init
+
     def run(self):
 
         executer = self.conf.get("entry_point", "main.py")
         os.system(os.path.join(self.args.dir, executer))
+
+    r = run
 
     def query(self):
         if not self.tree:
@@ -119,6 +134,7 @@ class SubwayCLI:
             print("matched job id is %s" % self.jid, file=sys.stderr)
         return getattr(self, "query_" + self.args.action, self.query_info)()
 
+    q = query
     # beginning_real_ts, reason, assoc
 
     def query_info(self):
@@ -261,8 +277,22 @@ class SubwayCLI:
         elif self.args.action == "edit" or self.args.action == "e":
             editor(os.path.join(self.args.dir, ".subway", "config.json"))
 
+    c = config
+
     def help(self):
         self.parser.print_help()
+
+    h = help
+
+    def debug(self):
+        if self.args.object == "history":
+            if self.args.action in ["clear", "clean"]:
+                with open(
+                    os.path.join(self.args.dir, ".subway", "history.json"), "w"
+                ) as f:
+                    json.dump({}, f)
+
+    d = debug
 
     def _noid(self):
         raise CLIException("Please specify job id", code=12)

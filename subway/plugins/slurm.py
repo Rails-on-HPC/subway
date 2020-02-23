@@ -1,5 +1,5 @@
 from ..framework import PlainChk, PlainSub
-from .slurmoo import SlurmJob
+from subway.components import SlurmJob
 from ..config import history
 from ..utils import now_ts
 

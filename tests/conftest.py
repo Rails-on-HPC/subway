@@ -21,6 +21,23 @@ def reset_history():
     )
 
 
+def pytest_addoption(parser):
+    parser.addoption('--slurm', action='store_true',
+                     default=False, help="enable longrundecorated tests")
+
+
+def pytest_collection_modifyitems(config, items):
+    """
+    if -all not specified, the test functions marked by slurm is omitted
+    """
+    if config.getoption("--slurm"):
+        return
+    skip_slurm = pytest.mark.skip(reason="need --all option to run")
+    for item in items:
+        if "slurm" in item.keywords:
+            item.add_marker(skip_slurm)
+
+
 @pytest.fixture(scope="function")
 def history():
     """

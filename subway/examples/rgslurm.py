@@ -4,6 +4,7 @@ from shutil import copyfile
 
 from ..plugins import SlurmChk, SlurmSub
 from ..config import conf
+from subway.components import SlurmTask
 
 
 class RgSSub(SlurmSub):
@@ -12,11 +13,13 @@ class RgSSub(SlurmSub):
         super().__init__(resource_limit=resource_limit)
 
     def submit_pending(self, jobid):
-
         sbatchfile = os.path.join(conf["inputs_abs_dir"], jobid + ".sh")
-        command = "sbatch %s" % sbatchfile
-        print(command)
-        os.system(command)
+        t = SlurmTask(sbatch_path=sbatchfile)
+        t.submit()
+        print(t.jobid())
+        # command = "sbatch %s" % sbatchfile
+        # print(command)
+        # subprocess.run(command)
 
 
 class RgSChk(SlurmChk):
@@ -24,20 +27,20 @@ class RgSChk(SlurmChk):
         self._py = _py
         super().__init__(params)
 
-    def render_sbatch(self, jobid):
+    def _render_command(self, jobid):
         mainp = os.path.join(conf["work_dir"], conf["executable"])
         # shall use ./executables/randomg_run.py
         inputp = os.path.join(conf["inputs_abs_dir"], jobid)
         outputp = os.path.join(conf["outputs_abs_dir"], jobid)
         command = "%s %s %s %s" % (self._py, mainp, inputp, outputp)
-        sbatch_template = f"""#! /bin/bash
-#SBATCH -N 1
-#SBATCH -n 1
-#SBATCH --job-name {jobid}
-{command}
-"""
-        with open(os.path.join(conf["inputs_abs_dir"], jobid + ".sh"), "w") as f:
-            f.writelines([sbatch_template])
+        return [command]
+
+    def _render_task(self, jobid):
+        SlurmTask(
+            sbatch_path=os.path.join(conf["inputs_abs_dir"], jobid + ".sh"),
+            sbatch_commands=self._render_command(jobid),
+            sbatch_options=["-N 1", "-n 1", "--job-name %s" % jobid],
+        )
 
     def check_kickstart(self):
         newinput = str(uuid1())
@@ -46,7 +49,7 @@ class RgSChk(SlurmChk):
         with open(os.path.join(conf["inputs_abs_dir"], newinput), "w") as f:
             f.writelines(["%s\n%s" % (L, l)])
         print("kickstart input")
-        self.render_sbatch(newinput)
+        self._render_task(newinput)
         print("kickstart sbatch")
         return [(newinput, {})]
 
@@ -68,5 +71,5 @@ class RgSChk(SlurmChk):
             os.path.join(conf["inputs_abs_dir"], newinput),
         )
         print("begin create new sbatch file...")
-        self.render_sbatch(newinput)
+        self._render_task(newinput)
         return [(newinput, {})]
