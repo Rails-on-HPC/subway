@@ -1,1 +1,2 @@
-from .randomg import RgChk, RgSub
+from .rglocal import RgChk, RgSub
+from .rgslurm import RgSChk, RgSSub

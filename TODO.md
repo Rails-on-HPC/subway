@@ -1,6 +1,8 @@
-- [ ] absorted state and absorting_ts for tasks in history.json
-- [ ] make check job under control of the same submit system
+- [x] absorted state and absorting_ts for tasks in history.json
+- [x] make check job under control of the same submit system
 - [ ] good abstraction on resource management
 - [ ] slurm plugin for check and submit
-- [ ] add mechanism that one can manually add job naturally
+- [x] add mechanism that one can manually add job naturally (seems current setup is good enough for this, just run kickstart again at anytime)
 - [ ] exit of main if all jobs are checked
+- [ ] docs for code
+- [ ] manuals for cli

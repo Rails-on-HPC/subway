@@ -9,9 +9,9 @@ import json
 from functools import partial
 
 from .bootstrap import env_init
-from .utils import load_json, editor, print_json
+from .utils import load_json, editor, print_json, ts2str
 from .htree import HTree
-from .exceptions import CLIException
+from .exceptions import CLIException, NoAttribute
 
 
 class SubwayCLI:
@@ -40,13 +40,16 @@ class SubwayCLI:
         queryparser.add_argument(dest="action", help="query action for task")
         configparser = subparsers.add_parser("config", description="config subway")
         configparser.add_argument(dest="action", help="action on config")
+        # TODO: automatic way to add help for subparser, eg. decorator of query funcs
+        # TODO: plugable subcommands, eg slurm
         self.parser = parser
         if not _argv:
             _argv = sys.argv[1:]
         self.args = parser.parse_args(_argv)
-        self.conf = load_json(os.path.join(self.args.dir, ".subway", "config.json"))
-        self.history = load_json(os.path.join(self.args.dir, ".subway", "history.json"))
         self.tree = None
+
+        for a in ["reason", "assoc", "prev", "next"]:
+            self._meta_query_attr(a)
 
         for k in [
             "pending",
@@ -62,8 +65,26 @@ class SubwayCLI:
         ]:
             self._meta_query_key(k)
 
+        for t in [
+            "creating",
+            "beginning",
+            "finishing",
+            "checking",
+            "ending",
+            "beginning_real",
+        ]:
+            self._meta_query_ts(t)
+
     def __call__(self):
         try:
+            if self.args.command not in ["init", "help"]:
+                self.conf = load_json(
+                    os.path.join(self.args.dir, ".subway", "config.json")
+                )
+                self.history = load_json(
+                    os.path.join(self.args.dir, ".subway", "history.json")
+                )
+            # conf cannot load for init
             getattr(self, self.args.command, "help")()
         except CLIException as e:
             print(e.message, file=sys.stderr)
@@ -96,7 +117,9 @@ class SubwayCLI:
             self.jid = self.tree.match(self.jid)
             # print(self.jid)
             print("matched job id is %s" % self.jid, file=sys.stderr)
-        return getattr(self, "query_" + self.args.action, "query_info")()
+        return getattr(self, "query_" + self.args.action, self.query_info)()
+
+    # beginning_real_ts, reason, assoc
 
     def query_info(self):
         if self.jid:
@@ -109,6 +132,8 @@ class SubwayCLI:
             self.tree.print_tree(self.jid)
         else:
             self.tree.print_trees(self.tree.roots())
+
+    query_t = query_tree
 
     def query_input(self):
         if self.jid:
@@ -124,6 +149,8 @@ class SubwayCLI:
         else:
             self._noid()
 
+    query_i = query_input
+
     def query_output(self):
         if self.jid:
             outputpath = os.path.join(
@@ -138,31 +165,23 @@ class SubwayCLI:
         else:
             self._noid()
 
+    query_o = query_output
+
     def query_root(self):
         if self.jid:
             print(self.tree.root(self.jid))
         else:
             print(*self.tree.roots(), sep="\n")
 
-    def query_next(self):
-        if self.jid:
-            n = self.history[self.jid]["next"]
-            print(*n, sep="\n")
-        else:
-            self._noid()
-
-    def query_prev(self):
-        if self.jid:
-            p = self.history[self.jid]["prev"]
-            print(p)
-        else:
-            self._noid()
+    query_r = query_root
 
     def query_leaves(self):
         if self.jid:
             print(*self.tree.end(self.jid), sep="\n")
         else:
             print(*self.tree.leaves(), sep="\n")
+
+    query_l = query_leaves
 
     def query_state(self):
         if self.jid:
@@ -172,6 +191,21 @@ class SubwayCLI:
             for _, st in self.history.items():
                 s.add(st["state"])
             print(*s, sep="\n")
+
+    query_s = query_state
+
+    def _meta_query_attr(self, key):
+        def f(s):
+            if s.jid:
+                v = self.history[self.jid].get(key, "")
+                if isinstance(v, list):
+                    print(*v, sep="\n")
+                else:
+                    print(v)
+            else:
+                s._noid()
+
+        setattr(self, "query_" + key, partial(f, self))
 
     def _meta_query_key(self, key):
         """
@@ -202,10 +236,29 @@ class SubwayCLI:
 
         setattr(self, "query_" + key, partial(f, self))
 
+    def _meta_query_ts(self, tstype):
+        def f(s, readable=True):
+            if s.jid:
+                ts = self.history[s.jid].get(tstype + "_ts", "")
+                if ts:
+                    if readable:
+                        ts = ts2str(ts)
+                    print(ts)
+                else:
+                    raise NoAttribute("no %s timestamps for %s" % (tstype, self.jid))
+            else:
+                self._noid()
+
+        pfstr = partial(f, self, True)
+        pfts = partial(f, self, False)
+        # setattr(self, "query_" + tstype, pfstr) # may be conflict to state search
+        setattr(self, "query_" + tstype + "_ts", pfts)
+        setattr(self, "query_" + tstype + "_time", pfstr)
+
     def config(self):
-        if self.args.action == "show":
+        if self.args.action == "show" or self.args.action == "s":
             print_json(self.conf)
-        elif self.args.action == "edit":
+        elif self.args.action == "edit" or self.args.action == "e":
             editor(os.path.join(self.args.dir, ".subway", "config.json"))
 
     def help(self):

@@ -68,7 +68,9 @@ class PlainChk(Checker):
             for f in checking_fs:
                 if self.is_checked(f):
                     nfs = self.check_task(f)
-                    history[f]["state"] = "checked"
+                    if history[f]["state"] != "frustrated":
+                        # check_checking also has the right to label the job frustrated
+                        history[f]["state"] = "checked"
                     history[f]["ending_ts"] = self.ending_time(f)
                     for nf, resource in nfs:
                         self.post_new_input(nf, resource, f)
@@ -84,7 +86,8 @@ class PlainChk(Checker):
             for f in resolving_fs:
                 if self.is_resolved(f):
                     nfs = self.check_task(f)
-                    history[f]["state"] = "resolved"
+                    if history[f]["state"] != "failed":
+                        history[f]["state"] = "resolved"
                     history[f]["ending_ts"] = self.ending_time(f)
                     for nf, resource in nfs:
                         self.post_new_input(nf, resource, f)

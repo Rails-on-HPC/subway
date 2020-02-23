@@ -19,9 +19,9 @@ def default_conf(path):
     conf = {}
     conf["inputs_dir"] = "inputs"
     conf["outputs_dir"] = "outputs"
-    # conf["main_prefix"] = "main"
-    # conf["check_prefix"] = "check"
-    conf["work_dir"] = path
+    conf["check_inputs_dir"] = "cinputs"
+    conf["check_outputs_dir"] = "coutputs"
+    conf["work_dir"] = path  # not necessary, can serve as a double check
     conf["resource_limit"] = {}
     conf["entry_point"] = "main.py"
     return conf

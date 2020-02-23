@@ -10,6 +10,11 @@ def now_ts():
     return datetime.now().timestamp()
 
 
+def ts2str(ts):
+    do = datetime.fromtimestamp(ts)
+    return do.strftime("%Y-%m-%d, %H:%M:%S")
+
+
 def load_json(conf_file):
     with open(conf_file, "r") as fp:
         conf_dict = json.load(fp)
