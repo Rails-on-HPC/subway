@@ -22,8 +22,12 @@ def reset_history():
 
 
 def pytest_addoption(parser):
-    parser.addoption('--slurm', action='store_true',
-                     default=False, help="enable longrundecorated tests")
+    parser.addoption(
+        "--slurm",
+        action="store_true",
+        default=False,
+        help="enable longrundecorated tests",
+    )
 
 
 def pytest_collection_modifyitems(config, items):

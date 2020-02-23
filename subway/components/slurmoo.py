@@ -64,7 +64,7 @@ class SlurmJob:
                                 'Start': '2020-02-23T10:05:55', 'End': '2020-02-23T10:06:15',
                                 'Elapsed': '00:00:20', 'NNodes': '1', 'NCPUS': '2', 'NodeList': 'c7'}
         """
-        #TODO: caution on "ValueError: time data 'Unknown' does not match format '%Y-%m-%dT%H:%M:%S'"
+        # TODO: caution on "ValueError: time data 'Unknown' does not match format '%Y-%m-%dT%H:%M:%S'"
         r = subprocess.run(
             [
                 self.sacct,

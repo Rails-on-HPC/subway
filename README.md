@@ -5,21 +5,24 @@ SUBWAY
 
 ### Install
 
-`python3 setup.py install`
+* `python3 setup.py install`
 
-### usage
+* or use directly by only `export SUBWAY_PATH=/abs/dir/for/bin/` (note the last `/`) and
+`export PATH=$SUBWAY_PATH:$PATH`
+
+
+### Simple Slurm Example
 
 ```bash
 mkdir demo
 cd demo
 subway init
-cp ../dev/run.py run.py
-cp ../dev/main.py main.py
+cp subway/examples/miscs/rg_main.py main.py # you may need to change shebang of this py
+cp subway/examples/miscs/rg_run.py run.py
+subway config edit # add "executable": "run.py" in config.json
+subway run
 ```
 
-And add `"executer": "run.py"` in `demo/.subway/config.json`.
-
-Now `subway run` again and again
 
 ## Design principles
 
