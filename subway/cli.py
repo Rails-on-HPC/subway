@@ -6,6 +6,7 @@ import argparse  # click might be better, but as hpc app, we try our best to onl
 import os
 import sys
 import json
+import shutil
 from functools import partial
 
 from .bootstrap import env_init
@@ -50,7 +51,9 @@ class SubwayCLI:
             "debug", aliases="d", description="debug related commands"
         )
         debugparser.add_argument(dest="object", help="object for debug")
-        debugparser.add_argument(dest="action", help="action for debug")
+        debugparser.add_argument(
+            dest="action", help="action for debug", nargs="?", default=None
+        )
         # TODO: automatic way to add help for subparser, eg. decorator of query funcs
         # TODO: plugable subcommands, eg slurm
         self.parser = parser
@@ -88,7 +91,7 @@ class SubwayCLI:
 
     def __call__(self):
         try:
-            if self.args.command not in ["init", "help"]:
+            if self.args.command not in ["init", "i", "help", "h"]:
                 self.conf = load_json(
                     os.path.join(self.args.dir, ".subway", "config.json")
                 )
@@ -284,13 +287,23 @@ class SubwayCLI:
 
     h = help
 
+    def _history_clean(self):
+        with open(os.path.join(self.args.dir, ".subway", "history.json"), "w") as f:
+            json.dump({}, f)
+
     def debug(self):
         if self.args.object == "history":
             if self.args.action in ["clear", "clean"]:
-                with open(
-                    os.path.join(self.args.dir, ".subway", "history.json"), "w"
-                ) as f:
-                    json.dump({}, f)
+                self._history_clean()
+        if self.args.object == "reinit":
+            self._history_clean()
+            for p in [
+                os.path.join(self.args.dir, self.conf["inputs_dir"]),
+                os.path.join(self.args.dir, self.conf["outputs_dir"]),
+            ]:
+                if os.path.exists(p):
+                    shutil.rmtree(p)
+                os.mkdir(p)
 
     d = debug
 

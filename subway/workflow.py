@@ -26,8 +26,10 @@ def main_rt(checker, submitter, sleep_interval=10, loops=None):
     i = 0
     try:
         while (not loops) or (i < loops):
+            print("------begin checker------")
             checker()
             time.sleep(sleep_interval)
+            print("------begin submitter------")
             submitter()
             time.sleep(sleep_interval)
             i += 1

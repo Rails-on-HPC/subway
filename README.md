@@ -19,6 +19,7 @@ cd demo
 subway init
 cp subway/examples/miscs/rg_main.py main.py # you may need to change shebang of this py
 cp subway/examples/miscs/rg_run.py run.py
+chmod +x main.py
 subway config edit # add "executable": "run.py" in config.json
 subway run
 ```

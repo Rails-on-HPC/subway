@@ -3,4 +3,7 @@
 # helper script for those unable to install package via pip
 # just export SUBWAY_PATH=/absolute/dir/path/for/this/script/ and export PATH=$SUBWAY_PATH:$PATH
 
-python3 ${SUBWAY_PATH}sub.py $@
+if [[ -z "${SUBWAY_PYTHON}" ]]; then
+     export SUBWAY_PYTHON=python3
+
+${SUBWAY_PYTHON} ${SUBWAY_PATH}sub.py $@
