@@ -46,21 +46,20 @@ class PlainChk(Checker):
             if not running_fs:
                 print("no job is running", file=sys.stderr)
             for f in running_fs:
-                if self.is_finished(f):
+                if self.is_finished(f) or self.is_aborted(f):
                     history[f]["finishing_ts"] = self.finishing_time(f)
-                    history[f]["state"] = "finished"
-                    self.check_task(f)
-                    # check "converge" for new outputs and generate new input files if necessary
-
+                    history[f]["state"] = (
+                        "finished" if self.is_finished(f) else "aborted"
+                    )
+                    nfs = self.check_task(f)
+                    if nfs:
+                        assert (
+                            len(nfs) == 1
+                        )  # single job for check, one-one correspondence
+                        history[f]["assoc"] = nfs[0][0]
+                        history[f]["check_resource"] = nfs[0][1]
                     # for nf, resource in nfs:
                     #     self.post_new_input(nf, resource, f)
-                elif self.is_aborted(f):
-                    history[f]["state"] = "aborted"
-                    history[f]["finishing_ts"] = self.finishing_time(f)
-                    self.check_task(f)
-
-            # else:
-            #     print("no running job is finished or aborted", file=sys.stderr)
 
             checking_fs = [f for f, s in history.items() if s["state"] == "checking"]
             if not checking_fs:
@@ -132,9 +131,9 @@ class PlainChk(Checker):
         s = history[jobid]["state"]
 
         if s == "finished":
-            self.check_finished(jobid)
+            r = self.check_finished(jobid)
         elif s == "aborted":
-            self.check_aborted(jobid)
+            r = self.check_aborted(jobid)
         elif s == "checking":
             r = self.check_checking(jobid)
         elif s == "resolving":

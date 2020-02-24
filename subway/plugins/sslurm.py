@@ -5,7 +5,7 @@ Extra S is for specific or single (indicates that check job not go through slurm
 """
 import os
 from abc import abstractmethod
-from uuid import uuid1
+from uuid import uuid4
 
 from ..config import conf
 from ..components import SlurmJob, SlurmTask
@@ -81,7 +81,7 @@ class SSlurmChk(SlurmChk):
         return r
 
     def _render_newid(self):
-        return str(uuid1())
+        return str(uuid4())
 
     def check_kickstart(self):
         return self._render_check(self.params)

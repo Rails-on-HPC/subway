@@ -31,6 +31,8 @@ def mkdirs(path, conf):
     os.mkdir(os.path.join(path, conf["inputs_dir"]))
     os.mkdir(os.path.join(path, conf["outputs_dir"]))
     os.mkdir(os.path.join(path, ".subway"))
+    os.mkdir(os.path.join(path, conf["check_inputs_dir"]))
+    os.mkdir(os.path.join(path, conf["check_outputs_dir"]))
 
 
 def render_config(path, conf):

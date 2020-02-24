@@ -1,10 +1,7 @@
 import os
-from uuid import uuid1
-from shutil import copyfile
 
 from ..plugins import SSlurmChk, SSlurmSub
 from ..config import conf
-from subway.components import SlurmTask
 
 
 class RgSSub(SSlurmSub):

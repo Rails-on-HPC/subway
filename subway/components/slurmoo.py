@@ -9,6 +9,19 @@ from datetime import datetime
 from subway.exceptions import SubwayException
 
 
+slurm_abnormal_states = [
+    "BOOT_FAIL",
+    "CANCELLED",
+    "DEADLINE",
+    "FAILED",
+    "NODE_FAIL",
+    "OUT_OF_MEMORY",
+    "PREEMPTED",
+    "STOPPED",
+    "TIMEOUT",
+]
+
+
 def _slurm_time_trans(timestr):
     try:
         timeob = datetime.strptime(timestr, "%Y-%m-%dT%H:%M:%S")

@@ -7,5 +7,7 @@
   },
   "executable": "run.py",
   "entry_point": "main.py",
-  "slurm_options": ["-N 1", "-n 1"]
+  "slurm_options": ["-N 1", "-n 1"],
+  "check_executable": "check.py",
+  "check_slurm_options": ["-N 1", "-n 1"]
 }
