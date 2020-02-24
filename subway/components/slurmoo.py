@@ -31,7 +31,7 @@ class SlurmJob:
         self.jobinfo = self.get_jobinfo(self.jobid)
         self.jobname = self.jobinfo["JobName"]
 
-    def get_jobid(self, jobname, tries=6):
+    def get_jobid(self, jobname, tries=6, interval=0.8):
         for i in range(tries):
             try:
                 return self._get_jobid(jobname)
@@ -40,7 +40,7 @@ class SlurmJob:
                     raise e
                 else:
                     print(e.message, file=sys.stderr)
-                    time.sleep(0.5)
+                    time.sleep(interval)
 
     def _get_jobid(self, jobname):
         r = subprocess.run(
@@ -111,17 +111,22 @@ class SlurmTask:
         """
         self.sbatch = sbatch
         self.scancel = scancel
+        if not sbatch_path:
+            raise SlurmValueError("sbatch_path must be specified")
         self.sbatch_path = sbatch_path
         self.shebang = shebang
         if not sbatch_commands:
             sbatch_commands = []
         self.sbatch_commands = sbatch_commands
         if not sbatch_options:
-            sbatch_options = []
+            sbatch_options = (
+                []
+            )  # TODO: support dict sbatch options, may a consistent option API for subway?
         self.sbatch_options = sbatch_options
         if not os.path.exists(sbatch_path):
             self._render_sbatch()
         self.jid = None
+        self._slurm_outpath = None
 
     def _render_sbatch(self):
         sbatch_string = self.shebang + "\n"
@@ -133,6 +138,24 @@ class SlurmTask:
         with open(self.sbatch_path, "w") as f:
             f.writelines([sbatch_string])
         os.chmod(self.sbatch_path, 0o700)
+
+    def slurm_outpath(self):
+        # very experimental, not recommended for any production enviroment
+        # array job default out: slurm-%A_%a.out, plain job default: slurm-%j.out
+        # -e --error
+        # -o --output
+        # TODO: support customization on output file
+        # TODO: support jobname pattern?
+        # TODO: support on array job output
+        # TODO: relative output path
+        outname = []
+        if not self._slurm_outpath:
+            # for opt in self.sbatch_options:
+            #     if opt.startswith(("-e", "--error", "-o", "--output")):
+            #         outname.append()
+            _slurm_outpath = os.path.join(os.getcwd(), "slurm-" + self.jobid() + ".out")
+            self._slurm_outpath = [_slurm_outpath]
+        return self._slurm_outpath
 
     def submit(self):
         if not os.path.exists(self.sbatch_path):
@@ -171,3 +194,15 @@ class SlurmTask:
             [self.scancel, self.jid], stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
         return r
+
+    def delete(self, include_output=False):
+        if os.path.exists(self.sbatch_path):
+            os.remove(self.sbatch_path)
+        else:
+            print("sbatch file doesn't exist", file=sys.stderr)
+        if include_output:
+            for f in self.slurm_outpath():
+                if os.path.exists(f):
+                    os.remove(f)
+                else:
+                    print("output file %s is not generated" % f, file=sys.stderr)
