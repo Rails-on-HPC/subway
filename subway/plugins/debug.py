@@ -2,8 +2,9 @@ from ..framework import PlainChk, PlainSub
 
 
 class DebugChk(PlainChk):
-    def __init__(self, is_next=False):
+    def __init__(self, params=None, is_next=False, **kwargs):
         self.is_next = is_next
+        super().__init__(params=params, **kwargs)
 
     def check_checking(self, outputpath):
         print("the output path to be checked is %s" % outputpath)

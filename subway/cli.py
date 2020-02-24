@@ -292,7 +292,6 @@ class SubwayCLI:
             json.dump({}, f)
 
     def debug(self):
-        # TODO: shortcut for quick apply standard examples
         if self.args.object == "history":
             if self.args.action in ["clear", "clean"]:
                 self._history_clean()
@@ -311,6 +310,9 @@ class SubwayCLI:
                 if os.path.exists(p):
                     shutil.rmtree(p)
                 os.mkdir(p)
+        if self.args.object == "test":
+            if self.args.action == "rgd":
+                pass  # TODO: shortcut for quick apply standard examples for quick test
 
     d = debug
 

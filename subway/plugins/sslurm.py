@@ -29,9 +29,8 @@ class SSlurmChk(SlurmChk):
     """
 
     def __init__(self, params=None, fromconf=True, **kwargs):
-        self.kws = kwargs
         self.fromconf = fromconf
-        super().__init__(params)
+        super().__init__(params, **kwargs)
 
     @abstractmethod
     def _render_input(self, jobid, param):

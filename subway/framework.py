@@ -27,11 +27,12 @@ class Submitter(ABC):
 
 
 class PlainChk(Checker):
-    def __init__(self, params=None):
+    def __init__(self, params=None, **kwargs):
         """
 
         :param params: list of dict
         """
+        self.kws = kwargs
         self.params = params
 
     def __call__(self):
@@ -103,7 +104,8 @@ class PlainChk(Checker):
             if s["state"] not in end_states:
                 break
         else:
-            exit(0)
+            if not self.kws.get("test"):
+                exit(0)
 
     def post_new_input(self, inputpath, resource=None, prev=None):
         if prev:
