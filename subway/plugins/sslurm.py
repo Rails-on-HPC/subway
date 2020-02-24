@@ -23,13 +23,14 @@ class SSlurmSub(SlurmSub):
 class SSlurmChk(SlurmChk):
     """
     For subclass to be usable, one need to define methods including:
-    _render_input, _render_commands, _render_options (append to super() is recommended)
+    _render_input, _render_commands, _render_options_append (if needed)
     _render_resource (default {}, if needed), _render_newid (default uuid1, if needed)
     and specifically check_checking_main
     """
 
-    def __init__(self, params=None, **kwargs):
+    def __init__(self, params=None, fromconf=True, **kwargs):
         self.kws = kwargs
+        self.fromconf = fromconf
         super().__init__(params)
 
     @abstractmethod
@@ -55,7 +56,17 @@ class SSlurmChk(SlurmChk):
         return [""]
 
     def _render_options(self, jobid, param=None):
-        return ["-N 1", "--job-name %s" % jobid]
+        if not self.fromconf:
+            opts = []
+        ## read options from conf
+        else:
+            opts = conf["slurm_options"]  # TODO: support wildcard in config.json
+        opts.append("--job-name %s" % jobid)
+        opts = opts + self._render_options_append(jobid, param)
+        return opts
+
+    def _render_options_append(self, jobid, param=None):
+        return []
 
     def _render_resource(self, jobid, param=None):
         return {}

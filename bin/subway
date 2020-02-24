@@ -5,5 +5,6 @@
 
 if [[ -z "${SUBWAY_PYTHON}" ]]; then
      export SUBWAY_PYTHON=python3
+fi
 
 ${SUBWAY_PYTHON} ${SUBWAY_PATH}sub.py $@

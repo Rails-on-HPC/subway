@@ -9,6 +9,16 @@ from datetime import datetime
 from subway.exceptions import SubwayException
 
 
+def _slurm_time_trans(timestr):
+    try:
+        timeob = datetime.strptime(timestr, "%Y-%m-%dT%H:%M:%S")
+        timets = timeob.timestamp()
+    except ValueError:
+        timeob = timestr
+        timets = timeob
+    return timeob, timets
+
+
 class SlurmException(SubwayException):
     def __init__(self, message, code=90):
         super().__init__(message, code)
@@ -19,6 +29,7 @@ class SlurmValueError(SlurmException):
         super().__init__(message, code)
 
 
+# TODO: more robust interaction with sacct with various possibilities and error cases
 class SlurmJob:
     def __init__(self, jobname=None, jobid=None, sacct="sacct"):
         self.sacct = sacct
@@ -64,29 +75,29 @@ class SlurmJob:
                                 'Start': '2020-02-23T10:05:55', 'End': '2020-02-23T10:06:15',
                                 'Elapsed': '00:00:20', 'NNodes': '1', 'NCPUS': '2', 'NodeList': 'c7'}
         """
-        # TODO: caution on "ValueError: time data 'Unknown' does not match format '%Y-%m-%dT%H:%M:%S'"
+        # TODO: split sacct result, any number of space is not ok for nodelist "None assigned"
         r = subprocess.run(
             [
                 self.sacct,
                 "-j",
                 jobid,
-                "--format=User%30,JobID%50,Jobname%50,partition%20,state%20,time,start,end,elapsed,nnodes,ncpus,nodelist",
+                "--format=User%30,JobID%50,Jobname%50,partition%20,state%20,time,start,end,elapsed,nnodes,ncpus",
             ],
             stdout=subprocess.PIPE,
         )
         rl = r.stdout.decode("utf-8").split("\n")
         rl = [rl[0], rl[2]]
-        rl = [s.strip() for s in rl if s.strip()]
-        rll = [[s for s in l.split(" ") if s] for l in rl]
+        rll = [
+            [s.strip() for s in l.split(" ") if s.strip()] for l in rl
+        ]  # split using any space is nonsatisfied with nodelist
+
         assert len(rll[0]) == len(rll[1])
         info = {}
         for i, head in enumerate(rll[0]):
             info[head] = rll[1][i]
-        info["Start_ob"] = datetime.strptime(info["Start"], "%Y-%m-%dT%H:%M:%S")
-        info["Start_ts"] = info["Start_ob"].timestamp()
+        info["Start_ob"], info["Start_ts"] = _slurm_time_trans(info["Start"])
         if info.get("End", ""):
-            info["End_ob"] = datetime.strptime(info["End"], "%Y-%m-%dT%H:%M:%S")
-            info["End_ts"] = info["End_ob"].timestamp()
+            info["End_ob"], info["End_ts"] = _slurm_time_trans(info["End"])
         return info
 
 

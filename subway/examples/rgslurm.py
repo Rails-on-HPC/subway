@@ -25,11 +25,6 @@ class RgSChk(SSlurmChk):
         )
         return [command]
 
-    def _render_options(self, jobid, param=None):
-        r = super()._render_options(jobid, param)
-        r.append("-n 1")
-        return r
-
     def _render_input(self, jobid, param):
         L, l = param
         with open(os.path.join(conf["inputs_abs_dir"], jobid), "w") as f:
@@ -48,5 +43,5 @@ class RgSChk(SSlurmChk):
                 "find the converged result, computation stopped for this parameter %s"
                 % jobid
             )
-            return []
+            return []  # no new calculation is needed
         return [[L, l]]
