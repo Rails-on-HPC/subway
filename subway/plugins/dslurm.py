@@ -22,6 +22,7 @@ class DSlurmSub(SSlurmSub):
         self.submit_aborted(jobid)
 
 
+# TODO: sslurm is expected to merge into dslurm totally
 class DSlurmChk(SSlurmChk):
     """
     For subclass to be usable, one need to define methods including:
@@ -59,9 +60,7 @@ class DSlurmChk(SSlurmChk):
             opts = []
         ## read options from conf
         else:
-            opts = conf.get(
-                "check_slurm_options", []
-            )  # TODO: support wildcard in config.json
+            opts = conf.get("check_slurm_options", [])
         opts.append("--job-name %s" % checkid)
         opts = opts + self._render_check_options_append(jobid, param)
         return opts

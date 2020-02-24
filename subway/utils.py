@@ -3,6 +3,7 @@ import sys
 import json
 import shlex
 import subprocess
+from functools import partial
 from datetime import datetime
 
 
@@ -25,7 +26,48 @@ def print_json(json_dict, indent=2):
     print(json.dumps(json_dict, indent=indent))
 
 
-#: editors to try if VISUAL and EDITOR are not set
+def _replace(replace_func, s):
+    """
+
+    :param s: string match r"[\%]+[^\%]*"
+    :return:
+    """
+
+    if len(s) <= 1:
+        return s
+    if s[0] != "%":
+        return s
+    if s[-1] == "%":
+        return s
+    if s[1] == "%":
+        return s[1:]
+    if s[1] != "%":
+        return replace_func(s[1]) + s[2:]
+
+
+def replace_wildcard(replace_func, s):
+    state = 0
+    # 0: the last one in normal 1: the last one is %
+    rl = []
+    r = ""
+    for c in s:
+        if c == "%" and state == 0:
+            rl.append(r)
+            r = c
+            state = 1
+        elif c == "%" and state == 1:
+            r += c
+            state = 1
+        else:
+            r += c
+            state = 0
+    rl.append(r)
+    rl = [r for r in rl if r]
+    _preplace = partial(_replace, replace_func)
+    return "".join(list(map(_preplace, rl)))
+
+
+# editors to try if VISUAL and EDITOR are not set
 _default_editors = ["vim", "vi", "emacs", "nano"]
 
 

@@ -92,7 +92,7 @@ class HTree:
             yield from self.DFSvisit(nid)
 
     def BFSvisit(self, jobid):
-        pass  # TODO
+        pass  # TODO: BFS
 
     def leaves(self):
         if self.leaves_list is not None:

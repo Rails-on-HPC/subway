@@ -97,6 +97,13 @@ class PlainChk(Checker):
             #     print("no resolving job is finishing", file=sys.stderr)
 
         update_history()  # update history.json
+        ## check whether all tasks are finished, if yes exit main workflow
+        end_states = ["failed", "resolved", "checked", "frustrated"]
+        for j, s in history.items():
+            if s["state"] not in end_states:
+                break
+        else:
+            exit(0)
 
     def post_new_input(self, inputpath, resource=None, prev=None):
         if prev:

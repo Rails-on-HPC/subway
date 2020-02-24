@@ -21,7 +21,7 @@ def main_once(
 
 
 def main_rt(checker, submitter, sleep_interval=10, loops=None):
-    # TODO: realtime always-on monitor version of main
+    # TODO: better way for realtime always-on monitor version of main?
     # naive version
     i = 0
     try:

@@ -71,10 +71,6 @@ class RgDChk(DSlurmChk):
         # check script should be line2 - line1
 
     def check_finished_main(self, jobid):
-        # with open(os.path.join(conf["inputs_abs_dir"], jobid), "r") as f:
-        #     L, l = f.readlines()
-        # L = float(L)
-        # l = float(l)
         with open(os.path.join(conf["outputs_abs_dir"], jobid), "r") as f:
             r = f.readlines()
         r = float(r[0])
