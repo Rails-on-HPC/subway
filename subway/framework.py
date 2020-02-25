@@ -105,6 +105,7 @@ class PlainChk(Checker):
                 break
         else:
             if not self.kws.get("test"):
+                print("No active jobs anymore, quitting", file=sys.stderr)
                 exit(0)
 
     def post_new_input(self, inputpath, resource=None, prev=None):

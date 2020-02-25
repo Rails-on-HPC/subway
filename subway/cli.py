@@ -10,7 +10,7 @@ import shutil
 from functools import partial
 
 from .bootstrap import env_init
-from .utils import load_json, editor, print_json, ts2str
+from .utils import load_json, editor, print_json, ts2str, simple_template_render
 from .htree import HTree
 from .exceptions import CLIException, NoAttribute
 
@@ -61,6 +61,7 @@ class SubwayCLI:
             _argv = sys.argv[1:]
         self.args = parser.parse_args(_argv)
         self.tree = None
+        self._subway_path = os.path.dirname(__file__)
 
         for a in ["reason", "assoc", "prev", "next"]:
             self._meta_query_attr(a)
@@ -91,7 +92,7 @@ class SubwayCLI:
 
     def __call__(self):
         try:
-            if self.args.command not in ["init", "i", "help", "h"]:
+            if self.args.command not in ["init", "i", "help", "h", "debug", "d"]:
                 self.conf = load_json(
                     os.path.join(self.args.dir, ".subway", "config.json")
                 )
@@ -291,12 +292,34 @@ class SubwayCLI:
         with open(os.path.join(self.args.dir, ".subway", "history.json"), "w") as f:
             json.dump({}, f)
 
+    def _render_run_check(self, runpath, checkpath=None, subwaypath=None):
+        """
+
+        :param runpath: relative path (only file name)
+        :param checkpath:
+        :param subwaypath: dir path for subway lib
+        :return:
+        """
+        if not subwaypath:
+            subwaypath = self._subway_path
+        if checkpath:
+            shutil.copyfile(
+                os.path.join(subwaypath, "examples", "miscs", checkpath),
+                os.path.join(self.args.dir, "check.py"),
+            )
+        shutil.copyfile(
+            os.path.join(subwaypath, "examples", "miscs", runpath),
+            os.path.join(self.args.dir, "run.py"),
+        )
+
     def debug(self):
         if self.args.object == "history":
             if self.args.action in ["clear", "clean"]:
                 self._history_clean()
+
         if self.args.object == "reinit":
             self._history_clean()
+            self.conf = load_json(os.path.join(self.args.dir, ".subway", "config.json"))
             for p in [
                 os.path.join(self.args.dir, self.conf["inputs_dir"]),
                 os.path.join(self.args.dir, self.conf["outputs_dir"]),
@@ -310,9 +333,61 @@ class SubwayCLI:
                 if os.path.exists(p):
                     shutil.rmtree(p)
                 os.mkdir(p)
-        if self.args.object == "test":
+
+        if self.args.object == "setup":
             if self.args.action == "rgd":
-                pass  # TODO: shortcut for quick apply standard examples for quick test
+                conf = load_json(
+                    os.path.join(
+                        self._subway_path, "examples", "miscs", "rg_config.json"
+                    )
+                )
+                env_init(self.args.dir, conf, include_main=False)
+                var_dict = {"_py": sys.executable, "_sub": "RgDSub", "_chk": "RgDChk"}
+                simple_template_render(
+                    os.path.join(
+                        self._subway_path, "examples", "miscs", "rg_main.template"
+                    ),
+                    os.path.join(self.args.dir, conf.get("entry_point", "main.py")),
+                    var_dict,
+                )
+                self._render_run_check("rg_run.py", "rg_check.py")
+
+            elif self.args.action == "rgs":
+                conf = load_json(
+                    os.path.join(
+                        self._subway_path, "examples", "miscs", "rg_config.json"
+                    )
+                )
+                env_init(self.args.dir, conf, include_main=False)
+                var_dict = {"_py": sys.executable, "_sub": "RgSSub", "_chk": "RgSChk"}
+                simple_template_render(
+                    os.path.join(
+                        self._subway_path, "examples", "miscs", "rg_main.template"
+                    ),
+                    os.path.join(self.args.dir, conf.get("entry_point", "main.py")),
+                    var_dict,
+                )
+                self._render_run_check("rg_run.py")
+
+            elif self.args.action == "rgl":
+                conf = load_json(
+                    os.path.join(
+                        self._subway_path, "examples", "miscs", "rg_config.json"
+                    )
+                )
+                env_init(self.args.dir, conf, include_main=False)
+                var_dict = {"_py": sys.executable, "_sub": "RgSub", "_chk": "RgChk"}
+                simple_template_render(
+                    os.path.join(
+                        self._subway_path, "examples", "miscs", "rg_main.template"
+                    ),
+                    os.path.join(self.args.dir, conf.get("entry_point", "main.py")),
+                    var_dict,
+                )
+                self._render_run_check("rg_run.py")
+            os.chmod(
+                os.path.join(self.args.dir, conf.get("entry_point", "main.py")), 0o700
+            )
 
     d = debug
 

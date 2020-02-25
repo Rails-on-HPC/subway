@@ -18,9 +18,16 @@ default is `python3`.
 mkdir demo
 cd demo
 subway i -c subway/examples/miscs/rg_config.json
-cp subway/examples/miscs/rg_main.py main.py # you may need to change shebang of this py
+cp subway/examples/miscs/rgd_main.py main.py # you may need to change shebang of this py
 cp subway/examples/miscs/rg_run.py run.py
 chmod +x main.py
+subway run
+```
+
+or a short cut for set up as (we recommend this way):
+```bash
+mkdir demo && cd demo
+subway debug setup rgd
 subway run
 ```
 

@@ -26,6 +26,15 @@ def print_json(json_dict, indent=2):
     print(json.dumps(json_dict, indent=indent))
 
 
+def simple_template_render(template, output, var_dict):
+    # jinja is of course better but again no external dependence is required
+    with open(template, "r") as f:
+        l = f.read()
+    nl = l.format(**var_dict)
+    with open(output, "w") as f:
+        f.writelines([nl])
+
+
 def _replace(replace_func, s):
     """
 

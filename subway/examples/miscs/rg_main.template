@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+#! {_py}
 
 import os
 
@@ -12,10 +12,13 @@ cons.work_dir = os.path.dirname(os.path.abspath(__file__))
 
 from subway.workflow import main_once, main_rt
 
-from subway.examples import RgSSub, RgSChk
+from subway.examples import {_sub}, {_chk}
 
 
 if __name__ == "__main__":
-    main_rt(
-        RgSChk(_py="python", params=[[3, 0.5], [2, 0.4]]), RgSSub(), sleep_interval=3
-    )
+    main_rt(RgChk(_py="{_py}", params=[[3, 0.5], [2, 0.4]]), RgSub(_py="{_py}"), sleep_interval=3)
+
+
+# _py = current python executable
+# _sub = submitter class
+# _chk = checker class

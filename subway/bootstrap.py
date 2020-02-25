@@ -1,18 +1,19 @@
 """
 actions when sub init in cli, including mkdir, touch files and render templates in templates fold
 """
-import os, sys, json
+import os, sys, json, shutil
 
 ## note conf here is not from config.json, since there is no such file at the phase
 ## the source of the conf here should be interactive cli or specify json file from sub init -f config.json
-def env_init(path, conf=None):
+def env_init(path, conf=None, fromfile=None, include_main=True):
 
     if not conf:
         conf = default_conf(path)
     mkdirs(path, conf)
     render_config(path, conf)
     render_history(path)
-    render_main(path, conf)
+    if include_main:
+        render_main(path, conf, fromfile)
 
 
 def default_conf(path):
@@ -45,15 +46,21 @@ def render_history(path):
         json.dump({}, f, indent=2)
 
 
-def render_main(path, conf):
+def render_main(path, conf, fromfile=None):
     """
     render main.py as detailed as possible
 
     :param path:
     :param conf:
+    :param fromfile: file path string
     :return:
     """
-    mainpy = f"""#! {sys.executable}
+    if not conf:
+        entry_point = "main.py"
+    else:
+        entry_point = conf.get("entry_point", "main.py")
+    if not fromfile:
+        mainpy = f"""#! {sys.executable}
 
 import os
 
@@ -73,7 +80,8 @@ if __name__ == "__main__":
     main_once(DebugChk(), DebugSub())
 
     """
-
-    with open(os.path.join(path, "main.py"), "w") as f:
-        f.writelines([mainpy])
-    os.chmod(os.path.join(path, "main.py"), 0o700)
+        with open(os.path.join(path, entry_point), "w") as f:
+            f.writelines([mainpy])
+    else:  # fromfile
+        shutil.copyfile(fromfile, os.path.join(path, entry_point))
+    os.chmod(os.path.join(path, entry_point), 0o700)

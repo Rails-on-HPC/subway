@@ -1,9 +1,10 @@
 import sys
 import os
+import pytest
 from functools import partial
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-from subway.utils import replace_wildcard
+from subway.utils import replace_wildcard, simple_template_render
 
 
 def test_replace_wildcard():
@@ -30,3 +31,19 @@ def test_replace_wildcard():
     assert r("%ddD\n%%a") == "DDdD\n%a"
     assert r("slurm-%a.out") == "slurm-A.out"
     assert r("r%%%%a%a%%a%") == "r%%%aA%a%"
+
+
+@pytest.mark.parametrize(
+    "template",
+    [["{a}b{c}d", "AbCd"], ["{c}c{c}", "CcC"], ["a", "a"], ["{b}", "B"]],
+    indirect=True,
+)
+def test_template_render(template):
+    simple_template_render(
+        os.path.join(os.path.dirname(__file__), "test.template"),
+        os.path.join(os.path.dirname(__file__), "test.out"),
+        {"a": "A", "b": "B", "c": "C"},
+    )
+    # with open(os.path.join(os.path.dirname(__file__), "test.out"), "r") as f:
+    #     s = f.read()
+    # assert s == "AbCd"

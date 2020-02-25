@@ -50,3 +50,17 @@ def history():
     backup_history()
     yield
     reset_history()
+
+
+@pytest.fixture(scope="function")
+def template(request):
+    _in, _out = request.param
+    with open(os.path.join(work_path, "test.template"), "w") as f:
+        f.writelines([_in])
+    os.system("echo writing.....")
+    yield
+    with open(os.path.join(work_path, "test.out"), "r") as f:
+        out = f.read()
+    os.remove(os.path.join(work_path, "test.template"))
+    os.remove(os.path.join(work_path, "test.out"))
+    assert out == _out

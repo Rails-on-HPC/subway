@@ -1,5 +1,5 @@
 import os
-from uuid import uuid1
+from uuid import uuid4
 from shutil import copyfile
 
 from ..framework import PlainChk, PlainSub
@@ -23,14 +23,22 @@ class RgSub(PlainSub):
 
 class RgChk(PlainChk):
     def check_kickstart(self):
-        newinput = str(uuid1())
-        L, l = self.params
-        print(L, l)
-        with open(os.path.join(conf["inputs_abs_dir"], newinput), "w") as f:
-            f.writelines(["%s\n%s" % (L, l)])
-
-        print("kickstart input")
-        return [(newinput, {})]
+        # newinput = str(uuid1())
+        # L, l = self.params
+        # print(L, l)
+        # with open(os.path.join(conf["inputs_abs_dir"], newinput), "w") as f:
+        #     f.writelines(["%s\n%s" % (L, l)])
+        #
+        # print("kickstart input")
+        # return [(newinput, {})]
+        r = []
+        for param in self.params:
+            nid = str(uuid4())
+            L, l = param
+            with open(os.path.join(conf["inputs_abs_dir"], nid), "w") as f:
+                f.writelines(["%s\n%s" % (L, l)])
+            r.append((nid, {}))
+        return r
 
     def check_checking(self, outputpath):
         with open(os.path.join(conf["inputs_abs_dir"], outputpath), "r") as f:
@@ -43,7 +51,7 @@ class RgChk(PlainChk):
             print("find the converged result, computation stopped for this parameter")
             return []
 
-        newinput = str(uuid1())
+        newinput = str(uuid4())
         print("begin copy file...")
         copyfile(
             os.path.join(conf["inputs_abs_dir"], outputpath),
