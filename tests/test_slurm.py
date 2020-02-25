@@ -20,7 +20,7 @@ def test_task():
     )
     t.submit()
     print(t.jobid())
-    time.sleep(2)
+    time.sleep(3)
     t.delete(include_output=True)
 
 
