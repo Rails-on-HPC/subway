@@ -46,7 +46,9 @@ class SubwayCLI:
             "-j", "--job", dest="path", default=None, help="the task investigated"
         )
         queryparser.add_argument(dest="action", help="query action for task")
-        configparser = subparsers.add_parser("config", description="config subway")
+        configparser = subparsers.add_parser(
+            "config", aliases="c", description="config subway"
+        )
         configparser.add_argument(dest="action", help="action on config")
         debugparser = subparsers.add_parser(
             "debug", aliases="d", description="debug related commands"

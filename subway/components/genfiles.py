@@ -1,6 +1,8 @@
 """
 smarter file rendered can be utilized in _render_input of SSlurmChk
 """
+import json
+
 # TODO: provide smart unified API to generate files with given python data structure
 # .xml .json .yaml/toml .txt .csv
 def generate_file(data, output_path, output_format, output_config=None):
@@ -9,6 +11,9 @@ def generate_file(data, output_path, output_format, output_config=None):
 
     # firstly transform everything to standard intermediate state as a dict json like
     data = jsonify(data, _outer_most=True)
+    if output_format == "json":
+        with open(output_path, "w") as f:
+            json.dump(data, f)
 
 
 def jsonify(data, _outer_most=False, _outer=True, func=None):

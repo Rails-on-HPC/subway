@@ -231,12 +231,13 @@ class PlainChk(Checker):
 ## creating_ts pending beginning_ts running finishing_ts finished checking_ts checking  ending_ts checked/frustrated
 ##                                                       aborted checking_ts resolving  ending_ts resolved/failed
 class PlainSub(Submitter):
-    def __init__(self, resource_limit=None):
+    def __init__(self, resource_limit=None, **kwargs):
         self.resource_limit = resource_limit  ## dict here, {"job": 2}
         self.pending_queue = []
         self.finished_queue = []
         self.aborted_queue = []
         self.is_queue = False
+        self.kws = kwargs
 
     def __call__(self):
         self.is_queue = False  ## fix of realtime update for submitter

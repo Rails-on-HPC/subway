@@ -6,9 +6,11 @@ Extra S is for specific or single (indicates that check job not go through slurm
 import os
 from abc import abstractmethod
 from uuid import uuid4
+from functools import partial
 
 from ..config import conf
 from ..components import SlurmJob, SlurmTask
+from ..utils import replace_wildcard
 from .slurm import SlurmSub, SlurmChk
 
 
@@ -54,6 +56,11 @@ class SSlurmChk(SlurmChk):
     def _render_commands(self, jobid, param=None):
         return [""]
 
+    def _replace_func(self, jobid, char):
+        if char == "n":
+            return jobid
+        return ""
+
     def _render_options(self, jobid, param=None):
         if not self.fromconf:
             opts = []
@@ -62,6 +69,9 @@ class SSlurmChk(SlurmChk):
             opts = conf["slurm_options"]  # TODO: support wildcard in config.json
         opts.append("--job-name %s" % jobid)
         opts = opts + self._render_options_append(jobid, param)
+        _preplace = partial(self._replace_func, jobid)
+        for i, opt in enumerate(opts):
+            opts[i] = replace_wildcard(_preplace, opt)
         return opts
 
     def _render_options_append(self, jobid, param=None):
