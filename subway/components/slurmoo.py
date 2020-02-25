@@ -6,7 +6,7 @@ import time
 import subprocess
 from datetime import datetime
 
-from subway.exceptions import SubwayException
+from ..exceptions import SubwayException
 
 
 slurm_abnormal_states = [
