@@ -6,7 +6,6 @@ import os, sys, json, shutil
 ## note conf here is not from config.json, since there is no such file at the phase
 ## the source of the conf here should be interactive cli or specify json file from sub init -f config.json
 def env_init(path, conf=None, fromfile=None, include_main=True):
-
     if not conf:
         conf = default_conf(path)
     mkdirs(path, conf)
@@ -60,7 +59,7 @@ def render_main(path, conf, fromfile=None):
     else:
         entry_point = conf.get("entry_point", "main.py")
     if not fromfile:
-        mainpy = f"""#! {sys.executable}
+        mainpy = """#! {_py}
 
 import os
 
@@ -79,7 +78,10 @@ from subway.plugins import DebugSub, DebugChk
 if __name__ == "__main__":
     main_once(DebugChk(), DebugSub())
 
-    """
+    """.format(
+            _py=sys.executable
+        )
+
         with open(os.path.join(path, entry_point), "w") as f:
             f.writelines([mainpy])
     else:  # fromfile

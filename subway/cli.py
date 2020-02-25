@@ -21,6 +21,7 @@ class SubwayCLI:
         parser.add_argument(
             "-d", "--directory", dest="dir", default=os.getcwd(), help="project dir"
         )
+        # TODO: default search parent directories, just like git
         subparsers = parser.add_subparsers(dest="command")
         # init params
         initparser = subparsers.add_parser(

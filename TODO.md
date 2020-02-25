@@ -3,7 +3,7 @@
 - [ ] good abstraction on resource management
 - [x] slurm plugin for check and submit
 - [x] add mechanism that one can manually add job naturally (seems current setup is good enough for this, just run kickstart again at anytime)
-- [ ] exit of main if all jobs are checked
+- [x] exit of main if all jobs are checked
 - [ ] docs for code
 - [ ] manuals for cli
 - [ ] more sophisticated print or logger system

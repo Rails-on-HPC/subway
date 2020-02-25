@@ -1,6 +1,6 @@
 import pytest
 
-from shutil import copyfile
+from shutil import copyfile, rmtree
 import sys
 import os
 
@@ -50,6 +50,14 @@ def history():
     backup_history()
     yield
     reset_history()
+
+
+@pytest.fixture(scope="function")
+def tmpdir():
+    tmp_path = os.path.join(work_path, "test_tmp")
+    os.mkdir(tmp_path)
+    yield tmp_path
+    rmtree(tmp_path)
 
 
 @pytest.fixture(scope="function")
