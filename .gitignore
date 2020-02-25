@@ -1,4 +1,5 @@
 dev*
+_*
 .coverage
 *.backup
 .pytest_cache
