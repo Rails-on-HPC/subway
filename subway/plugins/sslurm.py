@@ -56,23 +56,34 @@ class SSlurmChk(SlurmChk):
     def _render_commands(self, jobid, param=None):
         return [""]
 
-    def _replace_func(self, jobid, char):
-        if char == "n":
+    def _replace_func(self, jobid, checkid, char):
+        # a second thought: why not unify with {} as format
+        if char == "j":
             return jobid
+        elif char == "c":
+            return checkid
         return ""
+
+    def _substitue_opts(self, opts, jobid, checkid=""):
+        """
+
+        :param opts: lits of strings
+        :return:
+        """
+        _preplace = partial(self._replace_func, jobid, checkid)
+        for i, opt in enumerate(opts):
+            opts[i] = replace_wildcard(_preplace, opt)
+        return opts
 
     def _render_options(self, jobid, param=None):
         if not self.fromconf:
             opts = []
         ## read options from conf
         else:
-            opts = conf["slurm_options"]  # TODO: support wildcard in config.json
+            opts = conf["slurm_options"].copy()
         opts.append("--job-name %s" % jobid)
         opts = opts + self._render_options_append(jobid, param)
-        _preplace = partial(self._replace_func, jobid)
-        for i, opt in enumerate(opts):
-            opts[i] = replace_wildcard(_preplace, opt)
-        return opts
+        return self._substitue_opts(opts, jobid)
 
     def _render_options_append(self, jobid, param=None):
         return []

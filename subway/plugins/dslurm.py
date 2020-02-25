@@ -60,10 +60,10 @@ class DSlurmChk(SSlurmChk):
             opts = []
         ## read options from conf
         else:
-            opts = conf.get("check_slurm_options", [])
+            opts = conf.get("check_slurm_options", []).copy()
         opts.append("--job-name %s" % checkid)
         opts = opts + self._render_check_options_append(jobid, param)
-        return opts
+        return self._substitue_opts(opts, jobid, checkid)
 
     def _render_check_options_append(self, jobid, checkid, param=None):
         return []

@@ -164,7 +164,7 @@ class SlurmTask:
         os.chmod(self.sbatch_path, 0o700)
 
     def slurm_outpath(self):
-        # very experimental, not recommended for any production enviroment
+        # very experimental, not recommended for any production environment
         # array job default out: slurm-%A_%a.out, plain job default: slurm-%j.out
         # -e --error
         # -o --output
