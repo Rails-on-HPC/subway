@@ -22,7 +22,7 @@ jobs:
       - name: black linter
         run: |
           pip install black
-          black subway tests setup.py --check
+          black . --check
         if: matrix.python-version > 3.5
       - name: test scripts
         run: |

@@ -72,7 +72,7 @@ def simple_template_render(template, output, var_dict):
 def _replace(replace_func, s):
     """
     inner function for :py:function:`replace_wildcard`
-    
+
     :param replace_func: Callable[[char], char].
         Char to char function. eg f(a) = A, indicates %a should be replaced by A.
     :param s: str, that match r"[\%]+[^\%]*"
