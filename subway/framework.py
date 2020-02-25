@@ -290,8 +290,24 @@ class PlainSub(Submitter):
 
         :return:
         """
-
+        # the default pattern: for each job, possible keys are *_count in history resource or check_resource
+        # compare these with items *_limit in resource_limit in config
+        resource_status = {}
+        for j, s in history.items():
+            if s["state"] == "running":
+                for k, v in s.get("resource", {}).items():
+                    if k.endswith("_count"):  # eg. cpu_count: 2
+                        resource_status[k] = resource_status.get(k, 0) + v
+            elif s["state"] in ["checking", "resolving"]:
+                for k, v in s.get("check_resource", {}).items():
+                    if k.endswith("_count"):  # eg. cpu_count: 2
+                        resource_status[k] = resource_status.get(k, 0) + v
+        for res_count, usage in resource_status.items():
+            if res_count[:-5] + "limit" in conf.get("resource_limit", {}):
+                if conf["resource_limit"][res_count[:-5] + "limit"] <= usage:
+                    return True  ## some usage has already bypass the limit
         return False  ## no resource limitation
+        # note the implementation here is for soft resource limit, since job ends only when limit is over
 
     def submit_job(self, jobid):
         """
