@@ -2,6 +2,7 @@
 
 # helper script for those unable to install package via pip
 # just export SUBWAY_PATH=/absolute/dir/path/for/this/script/ and export PATH=$SUBWAY_PATH:$PATH
+# no more elegant way to access sub.py, see http://mywiki.wooledge.org/BashFAQ/028
 
 if [[ -z "${SUBWAY_PYTHON}" ]]; then
      export SUBWAY_PYTHON=python3
