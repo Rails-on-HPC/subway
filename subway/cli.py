@@ -21,7 +21,6 @@ class SubwayCLI:
         parser.add_argument(
             "-d", "--directory", dest="dir", default=os.getcwd(), help="project dir"
         )
-        # TODO: default search parent directories, just like git
         subparsers = parser.add_subparsers(dest="command")
         # init params
         initparser = subparsers.add_parser(
@@ -96,13 +95,27 @@ class SubwayCLI:
     def __call__(self):
         try:
             if self.args.command not in ["init", "i", "help", "h", "debug", "d"]:
-                self.conf = load_json(
-                    os.path.join(self.args.dir, ".subway", "config.json")
-                )
+                # there is no system independent elegant way to get root path in python
+                # see https://stackoverflow.com/questions/17429044/constructing-absolute-path-with-os-path-join
+                cp = self.args.dir
+                # last path, current path
+                while True:
+                    if os.path.exists(os.path.join(cp, ".subway")):
+                        self.dir = cp
+                        break
+                    lp = cp
+                    cp = os.path.dirname(cp)
+                    if cp == lp:  # confirm lp is root path
+                        raise CLIException(
+                            message="fatal: Not a subway project", code=14
+                        )
+
+                self.conf = load_json(os.path.join(self.dir, ".subway", "config.json"))
                 self.history = load_json(
-                    os.path.join(self.args.dir, ".subway", "history.json")
+                    os.path.join(self.dir, ".subway", "history.json")
                 )
-            # conf cannot load for init
+                # conf cannot load for init
+
             getattr(self, self.args.command, "help")()
         except CLIException as e:
             print(e.message, file=sys.stderr)
@@ -127,7 +140,7 @@ class SubwayCLI:
     def run(self):
 
         executer = self.conf.get("entry_point", "main.py")
-        os.system(os.path.join(self.args.dir, executer))
+        os.system(os.path.join(self.dir, executer))
 
     r = run
 
@@ -161,7 +174,7 @@ class SubwayCLI:
     def query_input(self):
         if self.jid:
             inputpath = os.path.join(
-                self.args.dir, self.conf.get("inputs_dir", ""), self.jid
+                self.dir, self.conf.get("inputs_dir", ""), self.jid
             )
             if os.path.exists(inputpath):
                 with open(inputpath, "r") as f:
@@ -177,7 +190,7 @@ class SubwayCLI:
     def query_output(self):
         if self.jid:
             outputpath = os.path.join(
-                self.args.dir, self.conf.get("outputs_dir", ""), self.jid
+                self.dir, self.conf.get("outputs_dir", ""), self.jid
             )
             if os.path.exists(outputpath):
                 with open(outputpath, "r") as f:
@@ -282,7 +295,7 @@ class SubwayCLI:
         if self.args.action == "show" or self.args.action == "s":
             print_json(self.conf)
         elif self.args.action == "edit" or self.args.action == "e":
-            editor(os.path.join(self.args.dir, ".subway", "config.json"))
+            editor(os.path.join(self.dir, ".subway", "config.json"))
 
     c = config
 
