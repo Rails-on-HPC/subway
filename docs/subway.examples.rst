@@ -1,8 +1,9 @@
 subway.examples package
 =======================
 
-Submodules
-----------
+..
+    Submodules
+    ----------
 
 subway.examples.rgdslurm module
 -------------------------------
@@ -29,10 +30,11 @@ subway.examples.rgslurm module
     :show-inheritance:
 
 
-Module contents
----------------
+..
+    Module contents
+    ---------------
 
-.. automodule:: subway.examples
-    :members:
-    :undoc-members:
-    :show-inheritance:
+    .. automodule:: subway.examples
+        :members:
+        :undoc-members:
+        :show-inheritance:

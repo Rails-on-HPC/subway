@@ -1,14 +1,15 @@
-from abc import ABC, abstractmethod
 import os
 import sys
 import heapq
+from abc import ABC, abstractmethod
+
 from .utils import now_ts
 from .config import history, conf, update_history
 
 
 class Checker(ABC):
     """
-    based on output path, check whether converge and give possibly next input files
+    Empty base abstract class for checker.
     """
 
     @abstractmethod
@@ -18,7 +19,7 @@ class Checker(ABC):
 
 class Submitter(ABC):
     """
-
+    Empty base abstract class for submitter.
     """
 
     @abstractmethod
@@ -27,6 +28,10 @@ class Submitter(ABC):
 
 
 class PlainChk(Checker):
+    """
+    The very general checker class.
+    """
+
     def __init__(self, params=None, **kwargs):
         """
 
@@ -36,6 +41,12 @@ class PlainChk(Checker):
         self.params = params
 
     def __call__(self):
+        """
+        `DIY: not recommended`.
+        main process of checker.
+
+        :return: None.
+        """
         if not history:  ## preprocess for kickstart inputs file and history.json
 
             nfs = self.check_task()
@@ -108,31 +119,49 @@ class PlainChk(Checker):
                 print("No active jobs anymore, quitting", file=sys.stderr)
                 exit(0)
 
-    def post_new_input(self, inputpath, resource=None, prev=None):
+    def post_new_input(self, jobid, resource=None, prev=None):
+        """
+        `DIY: not recommended.`
+        Make some inplace changes on history dict after new task is generated,
+        it is vital for history record system.
+        This method is not recommended to customize in subclass of checker,
+        at least, one should include it by ``super().post_new_input``.
+
+        :param jobid: str. new job id.
+        :param resource: Optional[Dict]. resource dict for the new job.
+        :param prev: Optional[str]. Parent job id. Default None indicates no prev job.
+        :return: None.
+        """
         if prev:
-            history[prev]["next"].append(inputpath)
-        history[inputpath] = {}
-        history[inputpath]["state"] = "pending"
-        history[inputpath]["prev"] = prev
-        history[inputpath]["next"] = []
-        history[inputpath]["creating_ts"] = now_ts()
+            history[prev]["next"].append(jobid)
+        history[jobid] = {}
+        history[jobid]["state"] = "pending"
+        history[jobid]["prev"] = prev
+        history[jobid]["next"] = []
+        history[jobid]["creating_ts"] = now_ts()
         if not resource:
             resource = {}
-        history[inputpath]["resource"] = resource
+        history[jobid]["resource"] = resource
         # resource is in general a dict indicating specific computation resource for this task
 
     def check_task(self, jobid=None):
         """
-        determine whether output is converged and if not, generate new input files for more calculation
-        with the path and resource returned
+        `DIY: not recommended.`
+        Determine whether output is "converged" and if not, generate new input files for more calculation
+        with the new jobid and resource returned.
+        The inner process will dispatch to :py:meth:`check_finished`, :py:meth:`check_aborted`
+        :py:meth:`check_checking`, :py:meth:`check_resolving`.
 
-        :param outputpath: relativepath (uuid string), if this is None, it means kickstart generation for inputs
-        :return: [(nextfilename, resourcereuqired)]
+        :param jobid: Optional[str, None]. Default None means kickstart generation for inputs tasks.
+        :return: List[Tuple[str, Dict]]. [(next jobid, resource dict)]
         """
-        # jobid = None for kickstart, jobid state can be finished (to generate check input no new id -> checked),
-        # aborted (to generate analyse input no new id -> analysed)
+        # jobid = None for kickstart,
+        # jobid state can be:
+        # finished (to generate check input and check id -> checked),
+        # aborted (to generate analyse input and check id -> analysed)
         # checked (to generate main input and new id, -> ended)
         # analysed (to generate main input and new id, -> resolved/failed)
+
         r = None  # [()]
         if not jobid:
             r = self.check_kickstart()
@@ -140,42 +169,108 @@ class PlainChk(Checker):
 
         s = history[jobid]["state"]
 
-        if s == "finished":
-            r = self.check_finished(jobid)
-        elif s == "aborted":
-            r = self.check_aborted(jobid)
-        elif s == "checking":
-            r = self.check_checking(jobid)
-        elif s == "resolving":
-            r = self.check_resolving(jobid)
+        # if s == "finished":
+        #     r = self.check_finished(jobid)
+        # elif s == "aborted":
+        #     r = self.check_aborted(jobid)
+        # elif s == "checking":
+        #     r = self.check_checking(jobid)
+        # elif s == "resolving":
+        #     r = self.check_resolving(jobid)
+
+        if s in ["finished", "aborted", "checking", "resolving"]:
+            r = getattr(self, "check_" + s)(jobid)
         else:
             raise ValueError("check_task doesn't support job state %s" % s)
+            # TODO: change to subway exceptions?
         return r
 
     def check_finished(self, jobid):
+        """
+        `DIY: depends.`
+        Check job whose state is ``finished``.
+        Namely, the main task has been computed sucessfully,
+        we need to check output of main task to further
+        generate check job and associated check input.
+        On the other hand, if there is no need for check job
+        to be controlled by submitter (i.e. one simply check
+        the main output in checker and generate new jobs),
+        one can omit this method, since the default implementation
+        is used for such case (no check job scenario).
+
+        :param jobid: str.
+        :return: List[Tuple[str, Dict]]. The length of the list must be
+            0 (no check job) or
+            1 (namely check job must be one to one correspondence with main job).
+        """
         history[jobid]["state"] = "checking"
         history[jobid]["checking_ts"] = now_ts()
         # skip check job submit, check them directly
+        return []
 
     def check_aborted(self, jobid):
+        """
+        `DIY: depends.`
+        Check job whose state is ``aborted``.
+        These jobs failed the main task, and this method
+        should generate resolve task and resolve input if necessary.
+        If resolve job is not under control of submitter,
+        the default implementation is ok.
+
+        :param jobid: str.
+        :return: List[Tuple[str, Dict]]. The length of the list must be 0 or 1.
+        """
         history[jobid]["state"] = "resolving"
         history[jobid]["checking_ts"] = now_ts()
+        return []
 
     def check_kickstart(self):
+        """
+        `DIY: strongly recommended.`
+        Generate jobs with inputs at the beginning.
+        The default impl does nothing. If the user doesn't define this method
+        in subclass, then the user must add inputs files and possible items
+        in empty history.json by hand.
+
+        :return: List[Tuple[str, Dict]]. [(jobid, resource dict)]
+        """
         return []
 
     @abstractmethod
     def check_checking(self, jobid):
+        """
+        `DIY: must.`
+        Check job whose state is ``checking``.
+        Jobs are sent to this method only when :py:meth:`is_checked` returns ``True``.
+        Generate possible new jobs and inputs based on results from main task
+        and possibly check task. The very core of checker class.
+
+        :param jobid: str.
+        :return: List[Tuple[str, Dict]]. [(jobid, resource dict), ...]
+        """
         return []
 
     def check_resolving(self, jobid):
+        """
+        `DIY: depends.`
+        Check job whose state is ``resolving``.
+        Jobs are sent to this method only when :py:meth:`is_resolved` returns ``True``.
+        If the user case has no consideration on error tolerant and aborted states,
+        the method can be left as it is doing nothing.
+
+        :param jobid: str.
+        :return: List[Tuple[str, Dict]]. [(jobid, resource dict), ...]
+        """
         return []
 
     def is_finished(self, jobid):
         """
-        This utils is to further distinguish those tasks that has incomplete outfile while still running
+        `DIY: strongly recommended.`
+        Whether a ``running`` task is finished.
+        The default impl is to check whether output file exists.
+        It is not a good criteria for finished job in most cases.
 
-        :param jobid: relativepath
+        :param jobid: str.
         :return:
         """
         outputs_abs_dir = conf["outputs_abs_dir"]
@@ -189,26 +284,63 @@ class PlainChk(Checker):
         return True
 
     def is_aborted(self, jobid):
+        """
+        `DIY: depends.`
+        Whether a ``running`` task is failed.
+
+        :param jobid: str.
+        :return: bool.
+        """
         return False
 
     def is_checked(self, jobid):
+        """
+        `DIY: depends.`
+        Whether a ``checking`` task is finished.
+
+        :param jobid: str.
+        :return: bool.
+        """
         return True
 
     def is_frustrated(self, jobid):
+        """
+        `DIY: depends.`
+        Whether a ``checking`` task is failed.
+
+        :param jobid: str.
+        :return: bool.
+        """
         return False
 
     def is_resolved(self, jobid):
+        """
+        `DIY: depends.`
+        Whether a ``resolving`` task is finished.
+
+        :param jobid: str.
+        :return: bool.
+        """
         return True
 
     def is_failed(self, jobid):
+        """
+        `DIY: depends.`
+        Whether a ``resolving`` task is failed.
+
+        :param jobid: str.
+        :return: bool.
+        """
         return False
 
     def finishing_time(self, jobid):
         """
+        `DIY: depends.`
+        This method is reponsible for 2 states: ``finished`` and ``aborted``.
+        The default impl for ``finished`` state is last modifed time of output file.
 
-
-        :param jobid:
-        :return:
+        :param jobid: str.
+        :return: float. timestamp.
         """
         if history[jobid]["state"] == "finished":
             outputpath = os.path.join(conf["outputs_abs_dir"], jobid)
@@ -220,10 +352,13 @@ class PlainChk(Checker):
 
     def ending_time(self, jobid):
         """
-        ending_time is reponsible for 4 states: checked resolved frustrated failed
+        `DIY: depends.`
+        This method is reponsible for 4 states:
+        ``checked``, ``resolved``, ``frustrated``, ``failed``.
+        The default impl is now.
 
-        :param jobid:
-        :return:
+        :param jobid: str.
+        :return: float. timestamp.
         """
         return now_ts()
 
@@ -231,6 +366,10 @@ class PlainChk(Checker):
 ## creating_ts pending beginning_ts running finishing_ts finished checking_ts checking  ending_ts checked/frustrated
 ##                                                       aborted checking_ts resolving  ending_ts resolved/failed
 class PlainSub(Submitter):
+    """
+    The very general submitter class.
+    """
+
     def __init__(self, resource_limit=None, **kwargs):
         self.resource_limit = resource_limit  ## dict here, {"job": 2}
         self.pending_queue = []

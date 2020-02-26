@@ -1,10 +1,14 @@
 """
-forest of many trees of tasks
+Forest of multiple trees of tasks
 """
 from .exceptions import MatchError
 
 
 class HTree:
+    """
+    Trees structure for tasks recorded in history.json.
+    """
+
     def __init__(self, history):
         self.history = history
         self.roots_list = None

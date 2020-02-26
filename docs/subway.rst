@@ -1,9 +1,9 @@
 subway package
 ==============
 
-
-Submodules
-----------
+..
+    Submodules
+    ----------
 
 subway.bootstrap module
 -----------------------

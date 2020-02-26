@@ -1,8 +1,9 @@
 subway.components package
 =========================
 
-Submodules
-----------
+..
+    Submodules
+    ----------
 
 subway.components.genfiles module
 ---------------------------------
@@ -21,10 +22,11 @@ subway.components.slurmoo module
     :show-inheritance:
 
 
-Module contents
----------------
+..
+    Module contents
+    ---------------
 
-.. automodule:: subway.components
-    :members:
-    :undoc-members:
-    :show-inheritance:
+    .. automodule:: subway.components
+        :members:
+        :undoc-members:
+        :show-inheritance:

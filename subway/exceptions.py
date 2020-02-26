@@ -1,3 +1,9 @@
+"""
+Exception classes for subway.
+"""
+# TODO: more organized and hierachical exceptions.
+
+
 class SubwayException(Exception):
     def __init__(self, message, code=10):
         """

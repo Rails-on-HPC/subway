@@ -1,8 +1,9 @@
 subway.plugins package
 ======================
 
-Submodules
-----------
+..
+    Submodules
+    ----------
 
 subway.plugins.debug module
 ---------------------------
@@ -37,10 +38,11 @@ subway.plugins.sslurm module
     :show-inheritance:
 
 
-Module contents
----------------
+..
+    Module contents
+    ---------------
 
-.. automodule:: subway.plugins
-    :members:
-    :undoc-members:
-    :show-inheritance:
+    .. automodule:: subway.plugins
+        :members:
+        :undoc-members:
+        :show-inheritance:
