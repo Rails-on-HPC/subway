@@ -9,5 +9,7 @@
   "entry_point": "main.py",
   "slurm_options": ["-N 1", "-n 1"],
   "check_executable": "check.py",
-  "check_slurm_options": ["-N 1", "-n 1"]
+  "check_slurm_options": ["-N 1", "-n 1"],
+  "executable_version": "0.1.0",
+  "check_executable_version": "1.0.0"
 }

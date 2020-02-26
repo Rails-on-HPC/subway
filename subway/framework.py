@@ -389,12 +389,22 @@ class PlainSub(Submitter):
             if history[t]["state"] == "pending":
                 history[t]["state"] = "running"
                 history[t]["beginning_ts"] = now_ts()
+                if conf.get("executable_version"):
+                    history[t]["executable_version"] = conf["executable_version"]
             elif history[t]["state"] == "finished":
                 history[t]["state"] = "checking"
                 history[t]["checking_ts"] = now_ts()
+                if conf.get("check_executable_version"):
+                    history[t]["check_executable_version"] = conf[
+                        "check_executable_version"
+                    ]
             elif history[t]["state"] == "aborted":
                 history[t]["state"] = "resolving"
                 history[t]["checking_ts"] = now_ts()
+                if conf.get("check_executable_version"):
+                    history[t]["check_executable_version"] = conf[
+                        "check_executable_version"
+                    ]
             else:
                 raise ValueError("submit job doesn't support job state %s" % s)
 

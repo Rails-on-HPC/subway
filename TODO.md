@@ -7,3 +7,5 @@
 - [ ] docs for code
 - [ ] manuals for cli
 - [ ] more sophisticated print or logger system
+- [ ] increase task coverage for future CI and collaboration
+- [x] excuatble version tracking

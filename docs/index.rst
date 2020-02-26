@@ -3,18 +3,40 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to subway's documentation!
-==================================
+SUBWAY
+=============================
+**SUBmit jobs in your own WAY**
+
+
+Design Documentation
+---------------------
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+
+   manual/design.rst
+
+
+API Documentation
+------------------
+
+.. toctree::
+   :maxdepth: 2
    
    modules.rst
 
 
+Release and Version History
+----------------------------
+
+.. toctree::
+   :maxdepth: 2
+
+   changelog.rst
+
+
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`

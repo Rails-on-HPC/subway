@@ -65,7 +65,15 @@ class SubwayCLI:
         self.tree = None
         self._subway_path = os.path.dirname(__file__)
 
-        for a in ["reason", "assoc", "prev", "next"]:
+        for a in [
+            "reason",
+            "assoc",
+            "prev",
+            "next",
+            "resource",
+            "executable_version",
+            "check_executable_version",
+        ]:
             self._meta_query_attr(a)
 
         for k in [

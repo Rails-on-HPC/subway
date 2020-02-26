@@ -2,5 +2,12 @@
   "inputs_dir": "inputs",
   "outputs_dir": "outputs",
   "executable": "run.py",
-  "entry_point": "main.py"
+  "entry_point": "main.py",
+  "check_inputs_dir": "cinputs",
+  "check_outputs_dir": "coutputs",
+  "resource_limit": {
+  },
+  "check_executable": "check.py",
+  "executable_version": "0.1.0",
+  "check_executable_version": "1.0.0"
 }
