@@ -8,11 +8,20 @@ import sys
 import json
 import shutil
 from functools import partial
+from datetime import datetime
 
 from .bootstrap import env_init
-from .utils import load_json, editor, print_json, ts2str, simple_template_render
+from .utils import (
+    load_json,
+    editor,
+    print_json,
+    ts2str,
+    simple_template_render,
+    statement_parser,
+)
 from .htree import HTree
 from .exceptions import CLIException, NoAttribute
+from . import version
 
 
 class SubwayCLI:
@@ -20,6 +29,14 @@ class SubwayCLI:
         parser = argparse.ArgumentParser(description="subway is comming...")
         parser.add_argument(
             "-d", "--directory", dest="dir", default=os.getcwd(), help="project dir"
+        )
+        parser.add_argument(
+            "-V",
+            "--version",
+            dest="version",
+            default=False,
+            action="store_true",
+            help="subway version",
         )
         subparsers = parser.add_subparsers(dest="command")
         # init params
@@ -44,7 +61,10 @@ class SubwayCLI:
         queryparser.add_argument(
             "-j", "--job", dest="path", default=None, help="the task investigated"
         )
-        queryparser.add_argument(dest="action", help="query action for task")
+        queryparser.add_argument(
+            "-s", "--statement", dest="statement", default=None, help="the query string"
+        )
+        queryparser.add_argument(dest="action", help="query action for task", nargs="?")
         configparser = subparsers.add_parser(
             "config", aliases="c", description="config subway"
         )
@@ -102,6 +122,9 @@ class SubwayCLI:
 
     def __call__(self):
         try:
+            if self.args.version:
+                print("subway version:", version)
+                return
             if self.args.command not in ["init", "i", "help", "h", "debug", "d"]:
                 # there is no system independent elegant way to get root path in python
                 # see https://stackoverflow.com/questions/17429044/constructing-absolute-path-with-os-path-join
@@ -130,7 +153,6 @@ class SubwayCLI:
             exit(e.code)
 
     def init(self):
-
         if self.args.conf is not None:
             with open(self.args.conf, "r") as f:
                 conf = json.load(f)
@@ -160,6 +182,10 @@ class SubwayCLI:
             self.jid = self.tree.match(self.jid)
             # print(self.jid)
             print("matched job id is %s" % self.jid, file=sys.stderr)
+        if self.args.statement:
+            self.args.action = "condition"
+        if not self.args.action:
+            raise CLIException("Must specify one action for query")
         return getattr(self, "query_" + self.args.action, self.query_info)()
 
     q = query
@@ -237,6 +263,43 @@ class SubwayCLI:
             print(*s, sep="\n")
 
     query_s = query_state
+
+    def query_condition(self):
+        # print(self.args.statement) #debug, somehow space in between will separate the args
+        try:
+            st = statement_parser(self.args.statement)
+        except (ValueError, TypeError) as e:
+            raise CLIException(message=e.args[0])
+        joblist = []
+        tskset = set()  # {(beginning_tso, beginning_ts)}
+        for k, v in st.items():
+            if k.endswith("_tso"):
+                # tsk = "".join(k.split("_")[:-1]) + "_ts"
+                tsk = k[:-1]
+                tskset.add((k, tsk))
+        for tso, tsk in tskset:
+            for j, s in self.history.items():
+                if s.get(tsk):
+                    s[tso] = datetime.fromtimestamp(s[tsk])
+        for j, s in self.history.items():
+            for k, v in st.items():
+                if v[0] == "=":
+                    if s.get(k):
+                        # print(j, k, s[k], v[1])
+                        if s[k] != v[1]:
+                            break
+                elif v[0] == "<":
+                    if s.get(k):
+                        if s[k] >= v[1]:
+                            break
+                elif v[0] == ">":
+                    if s.get(k):
+                        # print(j, k, s[k], v[1])
+                        if s[k] <= v[1]:
+                            break
+            else:
+                joblist.append(j)
+        print(*joblist, sep="\n")
 
     def _meta_query_attr(self, key):
         def f(s):

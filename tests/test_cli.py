@@ -41,3 +41,19 @@ def test_query_leaves(capsys):
         == "14293906-53c8-11ea-b8c1-34363bc66daa\n"
         + "094816fe-53c8-11ea-885f-34363bc66daa\n"
     )
+
+
+def test_query_condition(capsys):
+    # caution: tso format is not suitable for test due to timezone issue,
+    # may fail in CI with different tz
+    argv = [
+        "-d",
+        work_path,
+        "q",
+        "-s",
+        "beginning_ts>1582192941; state=pending",
+    ]
+    cl = SubwayCLI(_argv=argv)
+    cl()
+    captured = capsys.readouterr()
+    assert captured.out == "14293906-53c8-11ea-b8c1-34363bc66daa\n"

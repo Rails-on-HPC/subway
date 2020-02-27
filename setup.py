@@ -1,7 +1,6 @@
 from setuptools import setup
-from subway import __version__
+from subway import version
 
-version = ".".join([str(n) for n in __version__])
 
 if __name__ == "__main__":
     setup(

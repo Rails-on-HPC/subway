@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import json
 import shlex
@@ -16,7 +17,7 @@ def now_ts():
     return datetime.now().timestamp()
 
 
-def ts2str(ts):
+def ts2str(ts, _format="%Y-%m-%d, %H:%M:%S"):
     """
     transform timestamp to corresponding formatted string
 
@@ -24,7 +25,7 @@ def ts2str(ts):
     :return: str, eg. "2020-02-02, 02:02:20"
     """
     do = datetime.fromtimestamp(ts)
-    return do.strftime("%Y-%m-%d, %H:%M:%S")
+    return do.strftime(_format)
 
 
 def load_json(conf_file):
@@ -67,6 +68,46 @@ def simple_template_render(template, output, var_dict):
     nl = l.format(**var_dict)
     with open(output, "w") as f:
         f.writelines([nl])
+
+
+def statement_parser(st):
+    """
+    Parse "aa=b; c>13;e<f g>=h" into {"aa": ("=", "b"), "c": (">", 13)...}
+
+    :param st: str.
+    :return: Dict[str, Tuple[str, Any]].
+    """
+    l = re.split("[;\s]", st)
+    r = {}
+    pattern = re.compile(r"[^=><]*([=><]{1,2})[^=><]*")
+    for s in l:
+        if s:
+            sep = pattern.match(s)
+            if not sep:
+                raise ValueError("illegal query statement")
+            sep = sep.groups()[0]
+            b, a = s.split(sep)
+            a = _recover_type(a)
+            b = _recover_type(b)
+            r[b] = (sep, a)
+    return r
+
+
+def _recover_type(v):
+    """
+    recover "17" to 17.
+    recover "[]" to [].
+    recover "datetime(2020,1,1)" to datetime(2020,1,1)
+    keep "abc" as str.
+
+    :param v: str.
+    :return: Any.
+    """
+    try:
+        v = eval(v)
+    except (NameError, SyntaxError):
+        pass
+    return v
 
 
 def _replace(replace_func, s):

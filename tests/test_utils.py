@@ -2,9 +2,10 @@ import sys
 import os
 import pytest
 from functools import partial
+from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-from subway.utils import replace_wildcard, simple_template_render
+from subway.utils import replace_wildcard, simple_template_render, statement_parser
 
 
 def test_replace_wildcard():
@@ -47,3 +48,16 @@ def test_template_render(template):
     # with open(os.path.join(os.path.dirname(__file__), "test.out"), "r") as f:
     #     s = f.read()
     # assert s == "AbCd"
+
+
+def test_statement_parser():
+    stdans1 = {
+        "a": ("=", "b"),
+        "cc": ("=", "ad"),
+        "e": (">", 17),
+        "f": ("<=", datetime(2020, 2, 2)),
+    }
+    assert statement_parser("a=b;cc=ad e>17; f<=datetime(2020,2,2)") == stdans1
+    assert statement_parser("a=b;cc=ad e>17;  f<=datetime(2020,2,2)") == stdans1
+    assert statement_parser("a=b; cc=ad e>17;  f<=datetime(2020,2,2)") == stdans1
+    assert statement_parser("a=b cc=ad e>17 f<=datetime(2020,2,2)") == stdans1
