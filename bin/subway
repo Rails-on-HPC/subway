@@ -8,4 +8,6 @@ if [[ -z "${SUBWAY_PYTHON}" ]]; then
      export SUBWAY_PYTHON=python3
 fi
 
-${SUBWAY_PYTHON} ${SUBWAY_PATH}/sub.py $@
+${SUBWAY_PYTHON} ${SUBWAY_PATH}/sub.py "$@"
+
+# for quotes around $@, see https://stackoverflow.com/questions/17094086/passing-arguments-with-spaces-between-bash-script

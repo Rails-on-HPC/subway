@@ -268,7 +268,7 @@ class SubwayCLI:
     @staticmethod
     def _get(s, k, _default=None):
         """
-        _get({"a": {"b":1}}, "a.b") = 1
+        ``_get({"a": {"b":1}}, "a.b") = 1``
 
         :param s:
         :param k:
@@ -287,19 +287,29 @@ class SubwayCLI:
     @staticmethod
     def _set(s, k, v):
         """
-        TODO: implement _set
+        ``_set({"a":{"b":{"c":2}, "zz":"pp"}}, "a.b.m", "q")={'a': {'b': {'c': 2, 'm': 'q'}, 'zz': 'pp'}}``
 
         :param s: Dict.
         :param k: Any.
         :param v: Any.
-        :return: None.
+        :return: Dict. after the set
         """
-        pass
+        ks = k.split(".")
+        d = s
+        for c, i in enumerate(ks):
+            if not isinstance(d.get(i), dict):
+                if c == len(ks) - 1:
+                    d[i] = v
+                    break
+                else:
+                    return s
+            d.setdefault(i, {})
+            d = d[i]
+
+        return s
 
     def query_condition(self):
         # print(self.args.statement) #debug,
-        # somehow space in between will separate the args
-        # seems related to $@ forward, since pip version is ok
         try:
             st = statement_parser(self.args.statement)
         except (ValueError, TypeError) as e:

@@ -69,17 +69,13 @@ def test_query_condition(capsys):
         work_path,
         "q",
         "-s",
-        "prev<['0ce870a6-53c8-11ea-9f9d-34363bc66daa','05a83858-53c8-11ea-9091-34363bc66daa']",
+        "prev<['14293906-53c8-11ea-b8c1-34363bc66daa','05a83858-53c8-11ea-9091-34363bc66daa']",
     ]
     # note the single quote ' in the list
     cl = SubwayCLI(_argv=argv3)
     cl()
     captured = capsys.readouterr()
-    assert (
-        captured.out
-        == "094816fe-53c8-11ea-885f-34363bc66daa\n"
-        + "1089b602-53c8-11ea-bf63-34363bc66daa\n"
-    )
+    assert captured.out == "094816fe-53c8-11ea-885f-34363bc66daa\n"
 
     argv4 = [
         "-d",
