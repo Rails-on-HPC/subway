@@ -57,3 +57,52 @@ def test_query_condition(capsys):
     cl()
     captured = capsys.readouterr()
     assert captured.out == "14293906-53c8-11ea-b8c1-34363bc66daa\n"
+
+    argv2 = ["-d", work_path, "q", "-s", "next>0ce870a6-53c8-11ea-9f9d-34363bc66daa"]
+    cl = SubwayCLI(_argv=argv2)
+    cl()
+    captured = capsys.readouterr()
+    assert captured.out == "02089a58-53c8-11ea-ae5b-34363bc66daa\n"
+
+    argv3 = [
+        "-d",
+        work_path,
+        "q",
+        "-s",
+        "prev<['0ce870a6-53c8-11ea-9f9d-34363bc66daa','05a83858-53c8-11ea-9091-34363bc66daa']",
+    ]
+    # note the single quote ' in the list
+    cl = SubwayCLI(_argv=argv3)
+    cl()
+    captured = capsys.readouterr()
+    assert (
+        captured.out
+        == "094816fe-53c8-11ea-885f-34363bc66daa\n"
+        + "1089b602-53c8-11ea-bf63-34363bc66daa\n"
+    )
+
+    argv4 = [
+        "-d",
+        work_path,
+        "q",
+        "-s",
+        "resource.cpu_count>1",
+    ]
+    # note the single quote ' in the list
+    cl = SubwayCLI(_argv=argv4)
+    cl()
+    captured = capsys.readouterr()
+    assert captured.out == "1089b602-53c8-11ea-bf63-34363bc66daa\n"
+
+    argv5 = [
+        "-d",
+        work_path,
+        "q",
+        "-s",
+        "resource.cpu_count<>1",
+    ]
+    # note the single quote ' in the list
+    cl = SubwayCLI(_argv=argv5)
+    cl()
+    captured = capsys.readouterr()
+    assert captured.out == "1089b602-53c8-11ea-bf63-34363bc66daa\n"

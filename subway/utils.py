@@ -104,10 +104,12 @@ def _recover_type(v):
     :return: Any.
     """
     try:
-        v = eval(v)
+        nv = eval(v)
     except (NameError, SyntaxError):
-        pass
-    return v
+        nv = v
+    if callable(nv):
+        nv = v
+    return nv
 
 
 def _replace(replace_func, s):

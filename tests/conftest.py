@@ -32,7 +32,7 @@ def pytest_addoption(parser):
 
 def pytest_collection_modifyitems(config, items):
     """
-    if -all not specified, the test functions marked by slurm is omitted
+    if --slurm not specified, the test functions marked by slurm is omitted
     """
     if config.getoption("--slurm"):
         return
@@ -40,6 +40,10 @@ def pytest_collection_modifyitems(config, items):
     for item in items:
         if "slurm" in item.keywords:
             item.add_marker(skip_slurm)
+
+
+# it is weird only `pytest tests --slurm` works while `pytest --slurm` incurs error
+# though `pytest` works fine
 
 
 @pytest.fixture(scope="function")

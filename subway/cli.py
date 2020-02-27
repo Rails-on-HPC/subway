@@ -82,6 +82,7 @@ class SubwayCLI:
         if not _argv:
             _argv = sys.argv[1:]
         self.args = parser.parse_args(_argv)
+        # print(_argv, self.args)
         self.tree = None
         self._subway_path = os.path.dirname(__file__)
 
@@ -264,12 +265,46 @@ class SubwayCLI:
 
     query_s = query_state
 
+    @staticmethod
+    def _get(s, k, _default=None):
+        """
+        _get({"a": {"b":1}}, "a.b") = 1
+
+        :param s:
+        :param k:
+        :param _default:
+        :return:
+        """
+        ks = k.split(".")
+        d = s
+        for i in ks:
+            if d.get(i):
+                d = d[i]
+            else:
+                return _default
+        return d
+
+    @staticmethod
+    def _set(s, k, v):
+        """
+        TODO: implement _set
+
+        :param s: Dict.
+        :param k: Any.
+        :param v: Any.
+        :return: None.
+        """
+        pass
+
     def query_condition(self):
-        # print(self.args.statement) #debug, somehow space in between will separate the args
+        # print(self.args.statement) #debug,
+        # somehow space in between will separate the args
+        # seems related to $@ forward, since pip version is ok
         try:
             st = statement_parser(self.args.statement)
         except (ValueError, TypeError) as e:
             raise CLIException(message=e.args[0])
+        # print(st)
         joblist = []
         tskset = set()  # {(beginning_tso, beginning_ts)}
         for k, v in st.items():
@@ -283,20 +318,62 @@ class SubwayCLI:
                     s[tso] = datetime.fromtimestamp(s[tsk])
         for j, s in self.history.items():
             for k, v in st.items():
+
                 if v[0] == "=":
-                    if s.get(k):
+                    if self._get(s, k):
                         # print(j, k, s[k], v[1])
-                        if s[k] != v[1]:
+                        if self._get(s, k) != v[1]:
                             break
+                    else:
+                        break
                 elif v[0] == "<":
-                    if s.get(k):
-                        if s[k] >= v[1]:
+                    if self._get(s, k, "") != "":
+                        if (
+                            isinstance(v[1], list)
+                            or isinstance(v[1], set)
+                            or isinstance(v[1], tuple)
+                            or isinstance(v[1], dict)
+                        ):
+                            if self._get(s, k, "") not in v[1]:
+                                break
+                        elif self._get(s, k, "") >= v[1]:
                             break
+                    else:
+                        break
                 elif v[0] == ">":
-                    if s.get(k):
-                        # print(j, k, s[k], v[1])
-                        if s[k] <= v[1]:
+                    if self._get(s, k, "") != "":  # s.get(k) is not enough,
+                        # since we also have to exclude [] namely [] should return true
+
+                        if (
+                            isinstance(self._get(s, k), list)
+                            or isinstance(self._get(s, k), set)
+                            or isinstance(self._get(s, k), tuple)
+                            or isinstance(self._get(s, k), dict)
+                        ):
+                            if v[1] not in self._get(s, k, ""):
+                                break
+                        elif self._get(s, k, "") <= v[1]:
                             break
+                    else:
+                        break
+                elif v[0] == "<=":
+                    if self._get(s, k):
+                        if self._get(s, k) > v[1]:
+                            break
+                    else:
+                        break
+                elif v[0] == ">=":
+                    if self._get(s, k):
+                        if self._get(s, k) < v[1]:
+                            break
+                    else:
+                        break
+                elif v[0] == "<>":  # unequal sign
+                    if self._get(s, k):
+                        if self._get(s, k) == v[1]:
+                            break
+                    else:
+                        break
             else:
                 joblist.append(j)
         print(*joblist, sep="\n")

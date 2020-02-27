@@ -134,7 +134,7 @@
       "1089b602-53c8-11ea-bf63-34363bc66daa"
     ],
     "creating_ts": 1582192926.33528,
-    "resource": {},
+    "resource": {"cpu_count": 1},
     "beginning_ts": 1582192929.419203,
     "finishing_ts": 1582192929.4135473,
     "checking_ts": 1582192932.425284
@@ -146,7 +146,7 @@
       "14293906-53c8-11ea-b8c1-34363bc66daa"
     ],
     "creating_ts": 1582192932.425298,
-    "resource": {},
+    "resource": {"cpu_count": 2},
     "beginning_ts": 1582192935.498859,
     "finishing_ts": 1582192935.4947855,
     "checking_ts": 1582192938.503899
