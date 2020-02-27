@@ -273,8 +273,8 @@ class PlainChk(Checker):
         :param jobid: str.
         :return:
         """
-        outputs_abs_dir = conf["outputs_abs_dir"]
-        if os.path.exists(outputs_abs_dir):
+        outputs_abs_dir = conf.get("outputs_abs_dir")
+        if outputs_abs_dir and os.path.exists(outputs_abs_dir):
             output_fs = [
                 f
                 for f in os.listdir(outputs_abs_dir)
@@ -343,9 +343,11 @@ class PlainChk(Checker):
         :return: float. timestamp.
         """
         if history[jobid]["state"] == "finished":
-            outputpath = os.path.join(conf["outputs_abs_dir"], jobid)
-            if os.path.exists(outputpath):
-                return os.path.getmtime(outputpath)
+            outputs_abs_dir = conf.get("outputs_abs_dir")
+            if outputs_abs_dir and os.path.exists(
+                os.path.join(conf["outputs_abs_dir"], jobid)
+            ):
+                return os.path.getmtime(os.path.join(conf["outputs_abs_dir"], jobid))
             return now_ts()
         elif history[jobid]["state"] == "aborted":
             return now_ts()

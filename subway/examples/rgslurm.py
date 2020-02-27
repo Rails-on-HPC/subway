@@ -9,19 +9,6 @@ class RgSSub(SSlurmSub):
 
 
 class RgSChk(SSlurmChk):
-    def _render_commands(self, jobid, param=None):
-        mainp = os.path.join(conf["work_dir"], conf["executable"])
-        # shall use ./miscs/rg_run.py
-        inputp = os.path.join(conf["inputs_abs_dir"], jobid)
-        outputp = os.path.join(conf["outputs_abs_dir"], jobid)
-        command = "%s %s %s %s" % (
-            self.kws.get("_py", "python3"),
-            mainp,
-            inputp,
-            outputp,
-        )
-        return [command]
-
     def _render_input(self, jobid, param):
         L, l = param
         with open(os.path.join(conf["inputs_abs_dir"], jobid), "w") as f:

@@ -19,5 +19,13 @@ conf["config_path"] = config_path
 conf["history_path"] = os.path.join(work_dir, ".subway", "history.json")
 history = load_json(conf["history_path"])
 
-conf["inputs_abs_dir"] = os.path.join(conf["work_dir"], conf.get("inputs_dir", ""))
-conf["outputs_abs_dir"] = os.path.join(conf["work_dir"], conf.get("outputs_dir", ""))
+
+def _conf_abs_dir(prefix):
+    relkey = prefix + "_dir"
+    abskey = prefix + "_abs_dir"
+    if conf.get(relkey):
+        conf[abskey] = os.path.join(conf["work_dir"], conf[relkey])
+
+
+for prefix in ["inputs", "outputs", "check_inputs", "check_outputs"]:
+    _conf_abs_dir(prefix)

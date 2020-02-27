@@ -143,9 +143,8 @@ class SlurmTask:
             sbatch_commands = []
         self.sbatch_commands = sbatch_commands
         if not sbatch_options:
-            sbatch_options = (
-                []
-            )  # TODO: support dict sbatch options, may a consistent option API for subway?
+            sbatch_options = []
+            # TODO: support dict sbatch options, may a consistent option API for subway?
         self.sbatch_options = sbatch_options
         if not os.path.exists(sbatch_path):
             self._render_sbatch()

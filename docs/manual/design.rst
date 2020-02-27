@@ -26,6 +26,7 @@ Design Philosophy
     From ``.subway`` directory to enhanced ``subway`` CLI utility,
     subway behaves somehow parallelling ``git``.
 
+|
 
 CLI utility
 ===========
@@ -71,26 +72,32 @@ The power of CLI tool is illustrated below:
 There are more possibilies of CLI ``subway`` to be explored.
 
 
+|
+
 config.json
 =============
 
 The reserved configuration keys include:
 
-- ``inputs_dir``, ``outputs_dir``: str, relpath. The default directories for input files and output files. The job submission scripts are also recommended in ``inputs_dir`` with ``.sh`` suffix.
+- ``inputs_dir``, ``outputs_dir``: str, relpath. The default directories for input files and output files. The job submission scripts are also recommended in ``inputs_dir`` with ``.sh`` suffix. (omitted is ok)
 
-- ``check_inputs_dir``, ``check_outputs_dir``: str, relpath. The directories for check job inputs and outputs if there are any. These options can be omitted is check tasks don't go through submitter.
+- ``check_inputs_dir``, ``check_outputs_dir``: str, relpath. The directories for check job inputs and outputs if there are any. These options can be omitted is check tasks don't go through submitter. (omitted is ok)
 
 - ``entry_point``: str, relpath. The engine py script for monitoring tasks, default as ``main.py``.
+
+- ``work_dir``: str, abspath. Dir path for this subway project. (omitted is ok)
+
+- ``resource_limit``: Dict[str, Union[float, int]]. Keys end with ``_limit`` are treated as resource limitation. (omitted is ok)
+
+- ``executable_version``, ``check_executable version``: str. Script versions for main and check executables. (omitted is ok)
+
+
+The recommended keys conventions include:
 
 - ``executable``: str, relpath. The binary path for main task.
 
 - ``check_executable``: str, relpath. The binary path for check task (if any).
 
-- ``work_dir``: str, abspath. Dir path for this subway project.
-
-- ``resource_limit``: Dict[str, Union[float, int]]. Keys with `_limit` as the end are treated as resource limitation.
-
-- ``executable_version``, ``check_executable version``: str. Script versions for main and check executables.
 
 Note all path above in config are relative path compared to ``work_dir``, which is the only absolute path.
 
@@ -98,8 +105,14 @@ There are also other keys used in different plugins as submitter and checker.
 
 For example, :mod:`subway.plugins.sslurm` requires extra options, check plugin relavant documentations for more details:
 
+- ``slurm_commands``, ``check_slurm_commands``: List[str]. Used in sbatch scripts, main commands.
+
 - ``slurm_options``, ``check_slurm_options``: List[str]. Used in sbatch scripts, lines start with ``#SBATCH``.
 
+
+|
+
+.. _history.json:
 
 history.json
 =============
@@ -133,3 +146,77 @@ Keys in ``history.json`` are jobids, for each job, there is an information dict,
 Again, for plugins, more attributes are expected.  For example, :mod:`subway.plugins.sslurm`  has extra attributes in history.
 
 - ``beginning_real_ts``: float. Timestamps, when the job is begin running from slurm.
+
+
+|
+
+.. _CSA:
+
+Checker - Submitter Architecture
+=================================
+
+The main loop in entry_point of subway is just running checker and submitter again and again.
+
+The responsibility for the checker is:
+
+1. Check whether running jobs are finished or aborted or still running.
+
+2. If they are finished/aborted, mark their states accordingly,  and generate inputs for associate check/resolve task and return task id and resource for the new check/resolve task.
+
+3. Check whether checking/resolving jobs are checked(frustrated)/resolved(failed).
+
+4. If they are checked/resolved, generate inputs for new job and return new jobs id and their resource and then mark their state accordinglu.
+
+Step 1,2 of C transform jobs from running to finished/aborted. Step 3,4 of C transform jobs from checking/resolving to checked(frustrated)/resolved(failed).
+The subtlety is the timing of marking job states. Checker first marks running jobs as finished or aborted and then go to step 2.
+On the other hand, checker first generate new jobs and them marks jobs as checked(frustrated)/resolved(failed).
+
+The responsibility for the submitter is:
+
+1. Check whether there are some pending jobs.
+
+2. If yes, submit them and then mark them as running jobs.
+
+3. Check whether there are finished/aborted jobs.
+
+4. If yes, submit them as associate check jobs and then mark them as checking/resolving jobs.
+
+
+Throughout all the process, all items and state in :ref:`history.json` shall be carefully dealt with.
+
+
+|
+
+
+Double vs. Single Submitter
+========================================
+
+We call them DS and SS scheme for simplicity. The difference here is whether check task are managed by submitter.
+Specifically, in the case of slurm submitter, the difference is whether check task is simple and time saving to run inside
+entry_point main loop within python (SS), or check jobs are also time consuming and need to be run externally and submitted on slurm (DS).
+Subway supports both scheme. And DS scheme is exactly described in :ref:`csa`.
+
+For SS scheme, the responsibility for the checker is:
+
+1. Check whether running jobs are finished or aborted or still running.
+
+2. If they are finished/aborted, directly change their state to checking/resolving and do nothing else.
+
+3. Find checking/resolving jobs.
+
+4. Using check function insdie python to check the main outout and generate inputs for new job and return new jobs id and their resource, then change job states accordingly as checked(frustrated)/resolved(failed).
+
+
+The responsibility for the submitter is:
+
+1. Check whether there are some pending jobs.
+
+2. If yes, submit them and then mark them as running jobs.
+
+3. There is no finished/aborted job by design.
+
+4. Submit nothing. (skipped by design)
+
+
+As we can see, the above workflow parallels DS scheme so that they can share the same super class as the common abstractions.
+Since only step 2 do real submission, compared to step 2,4 in DS scheme, that's why it is called single submitter scheme.

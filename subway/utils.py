@@ -3,6 +3,7 @@ import re
 import sys
 import json
 import shlex
+import hashlib
 import subprocess
 from functools import partial
 from datetime import datetime
@@ -49,6 +50,20 @@ def print_json(json_dict, indent=2):
     :return: None.
     """
     print(json.dumps(json_dict, indent=indent))
+
+
+def md5file(path):
+    BUF_SIZE = 65536
+    md5 = hashlib.md5()
+
+    with open(path, "rb") as f:
+        while True:
+            data = f.read(BUF_SIZE)
+            if not data:
+                break
+            md5.update(data)
+
+    return md5.hexdigest()
 
 
 def simple_template_render(template, output, var_dict):

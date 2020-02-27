@@ -11,5 +11,7 @@
   "check_executable": "check.py",
   "check_slurm_options": ["-N 1", "-n 1"],
   "executable_version": "0.1.0",
-  "check_executable_version": "1.0.0"
+  "check_executable_version": "1.0.0",
+  "slurm_commands": ["{_py} {work_dir}/{executable} {inputs_abs_dir}/{jobid} {outputs_abs_dir}/{jobid}"],
+  "check_slurm_commands": ["{_py} {work_dir}/{check_executable} {check_inputs_abs_dir}/{checkid} {check_outputs_abs_dir}/{checkid}"]
 }

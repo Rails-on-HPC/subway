@@ -515,6 +515,7 @@ class SubwayCLI:
                         self._subway_path, "examples", "miscs", "rg_config.json"
                     )
                 )
+                conf["_py"] = sys.executable
                 env_init(self.args.dir, conf, include_main=False)
                 var_dict = {"_py": sys.executable, "_sub": "RgDSub", "_chk": "RgDChk"}
                 simple_template_render(
@@ -532,6 +533,7 @@ class SubwayCLI:
                         self._subway_path, "examples", "miscs", "rg_config.json"
                     )
                 )
+                conf["_py"] = sys.executable
                 env_init(self.args.dir, conf, include_main=False)
                 var_dict = {"_py": sys.executable, "_sub": "RgSSub", "_chk": "RgSChk"}
                 simple_template_render(
@@ -549,6 +551,7 @@ class SubwayCLI:
                         self._subway_path, "examples", "miscs", "rg_config.json"
                     )
                 )
+                conf["_py"] = sys.executable
                 env_init(self.args.dir, conf, include_main=False)
                 var_dict = {"_py": sys.executable, "_sub": "RgSub", "_chk": "RgChk"}
                 simple_template_render(

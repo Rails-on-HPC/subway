@@ -5,7 +5,12 @@ from functools import partial
 from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-from subway.utils import replace_wildcard, simple_template_render, statement_parser
+from subway.utils import (
+    replace_wildcard,
+    simple_template_render,
+    statement_parser,
+    md5file,
+)
 
 
 def test_replace_wildcard():
@@ -61,3 +66,10 @@ def test_statement_parser():
     assert statement_parser("a=b;cc=ad e>17;  f<=datetime(2020,2,2)") == stdans1
     assert statement_parser("a=b; cc=ad e>17;  f<=datetime(2020,2,2)") == stdans1
     assert statement_parser("a=b cc=ad e>17 f<=datetime(2020,2,2)") == stdans1
+
+
+def test_md5file():
+    assert (
+        md5file(os.path.join(os.path.dirname(__file__), ".subway", "history.json"))
+        == "00957b1f7591c6649f661f28e44aa395"
+    )

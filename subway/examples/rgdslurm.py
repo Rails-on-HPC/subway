@@ -11,19 +11,6 @@ class RgDSub(DSlurmSub):
 
 
 class RgDChk(DSlurmChk):
-    def _render_commands(self, jobid, param=None):
-        mainp = os.path.join(conf["work_dir"], conf["executable"])
-        # shall use ./miscs/rg_run.py
-        inputp = os.path.join(conf["inputs_abs_dir"], jobid)
-        outputp = os.path.join(conf["outputs_abs_dir"], jobid)
-        command = "%s %s %s %s" % (
-            self.kws.get("_py", "python3"),
-            mainp,
-            inputp,
-            outputp,
-        )
-        return [command]
-
     def _render_input(self, jobid, param):
         L, l = param
         with open(os.path.join(conf["inputs_abs_dir"], jobid), "w") as f:
@@ -46,19 +33,6 @@ class RgDChk(DSlurmChk):
             L = float(L)
             l = float(l)
             return [(L, l)]
-
-    def _render_check_commands(self, jobid, checkid, param=None):
-        mainp = os.path.join(conf["work_dir"], conf["check_executable"])
-        # shall use ./miscs/rg_check.py
-        inputp = os.path.join(conf["work_dir"], conf["check_inputs_dir"], checkid)
-        outputp = os.path.join(conf["work_dir"], conf["check_outputs_dir"], checkid)
-        command = "%s %s %s %s" % (
-            self.kws.get("_py", "python3"),
-            mainp,
-            inputp,
-            outputp,
-        )
-        return [command]
 
     def _render_check_input(self, jobid, checkid, param):
         with open(os.path.join(conf["inputs_abs_dir"], jobid), "r") as f:

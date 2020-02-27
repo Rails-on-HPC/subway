@@ -47,26 +47,11 @@ class DSlurmChk(SSlurmChk):
             sbatch_path=os.path.join(
                 conf["work_dir"], conf["check_inputs_dir"], checkid + ".sh"
             ),
-            sbatch_commands=self._render_check_commands(jobid, checkid, param),
-            sbatch_options=self._render_check_options(jobid, checkid, param),
+            sbatch_commands=self._render_commands(
+                jobid, checkid=checkid, param=param, prefix="check_slurm"
+            ),
+            # sbatch_options=self._render_check_options(jobid, checkid, param),
         )
-
-    @abstractmethod
-    def _render_check_commands(self, jobid, checkid, param=None):
-        return [""]
-
-    def _render_check_options(self, jobid, checkid, param=None):
-        if not self.fromconf:
-            opts = []
-        ## read options from conf
-        else:
-            opts = conf.get("check_slurm_options", []).copy()
-        opts.append("--job-name %s" % checkid)
-        opts = opts + self._render_check_options_append(jobid, param)
-        return self._substitue_opts(opts, jobid, checkid)
-
-    def _render_check_options_append(self, jobid, checkid, param=None):
-        return []
 
     def _render_check_resource(self, jobid, checkid, param=None):
         return {}
