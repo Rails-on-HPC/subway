@@ -10,6 +10,7 @@ from subway.utils import (
     simple_template_render,
     statement_parser,
     md5file,
+    flatten_dict,
 )
 
 
@@ -73,3 +74,17 @@ def test_md5file():
         md5file(os.path.join(os.path.dirname(__file__), ".subway", "history.json"))
         == "00957b1f7591c6649f661f28e44aa395"
     )
+
+
+def test_flatten_dict():
+    assert flatten_dict({"a": 1, "b": "cc"}, parent_key="h") == {"ha": 1, "hb": "cc"}
+    assert flatten_dict(
+        {"d": [{"m": "n", "k": ["zz"]}, 2, [3, 4]], "c": 1}, sep="~"
+    ) == {
+        "c": 1,
+        "d~list_0~k~list_0": "zz",
+        "d~list_0~m": "n",
+        "d~list_1": 2,
+        "d~list_2~list_0": 3,
+        "d~list_2~list_1": 4,
+    }

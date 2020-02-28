@@ -7,10 +7,13 @@
 - [ ] manuals for cli
 - [ ] more sophisticated print or logger system
 - [ ] increase task coverage for future CI and collaboration
+- [ ] add pre and post hooks for main
 
 ## Small tweaks
 - [x] absorted state and absorting_ts for tasks in history.json
 - [x] excuatble version tracking
+- [ ] strict version fix checking by hashing the file
+- [x] default job_count limitation (one line impl in sslurm)
 
 ## Thoughts and discussions
 

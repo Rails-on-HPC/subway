@@ -53,7 +53,13 @@ def print_json(json_dict, indent=2):
 
 
 def md5file(path):
-    BUF_SIZE = 65536
+    """
+    return md5 for given file
+
+    :param path: str, abspath for the file.
+    :return: str. md5 value
+    """
+    BUF_SIZE = 65536  # memory efficient impl
     md5 = hashlib.md5()
 
     with open(path, "rb") as f:
@@ -64,6 +70,32 @@ def md5file(path):
             md5.update(data)
 
     return md5.hexdigest()
+
+
+def _flatten_tolist(d, parent_key, sep):
+    items = []
+    if isinstance(d, list) or isinstance(d, tuple):
+        for i, j in enumerate(d):
+            items.extend(_flatten_tolist(j, "%slist_%s%s" % (parent_key, i, sep), sep))
+    elif isinstance(d, dict):
+        for k, v in d.items():
+            items.extend(_flatten_tolist(v, "%s%s%s" % (parent_key, k, sep), sep))
+    else:  # d is simply a number or str
+        items.extend([("%s" % (parent_key[:-1],), d)])
+    return items
+
+
+def flatten_dict(d, parent_key="", sep="~"):
+    """
+    Flatten a nested dict with list. eg. transform ``{"a":{"b":"c", "d": ["e", "f"]}}`` to
+    ``{"a.b": c, "a.d.list_0": "e" ...}``
+
+    :param d: Dict[str, Any]. Nested dict with possibly nested list and tuple.
+    :param parent_key: Optional[str]. Default ``""``. The common key prefix.
+    :param sep: Optional[str], default ``"~"``. The separator between different level of keys.
+    :return: Dict[str, Any]. Flattened dict.
+    """
+    return dict(_flatten_tolist(d, parent_key, sep))
 
 
 def simple_template_render(template, output, var_dict):
@@ -158,6 +190,7 @@ def replace_wildcard(replace_func, s):
     :param s: str, the string possibly with %a type wildcards, eg. "bc%de%%a"
     :return: str, the string with %a type wildcards all replaced
     """
+    # this utility is not used in latest codebase anymore.
     state = 0
     # 0: the last one in normal 1: the last one is %
     rl = []

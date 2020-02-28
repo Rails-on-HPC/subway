@@ -53,9 +53,6 @@ class DSlurmChk(SSlurmChk):
             # sbatch_options=self._render_check_options(jobid, checkid, param),
         )
 
-    def _render_check_resource(self, jobid, checkid, param=None):
-        return {}
-
     def _render_check(self, params, jobid=None, _type="main"):
         if _type == "main":
             r = []
@@ -72,7 +69,7 @@ class DSlurmChk(SSlurmChk):
                 checkid = self._render_newid()
                 self._render_check_input(jobid, checkid, param)
                 self._render_check_sbatch(jobid, checkid, param)
-                return [(checkid, self._render_check_resource(jobid, checkid, param))]
+                return [(checkid, self._render_resource(jobid, checkid, param))]
 
     def check_finished(self, jobid):  # should generate check input and check sbatch
         params = self.check_finished_main(jobid)

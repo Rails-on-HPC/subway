@@ -8,9 +8,9 @@ from abc import abstractmethod
 from uuid import uuid4
 from functools import partial
 
-from ..config import conf
+from ..config import conf, history
 from ..components import SlurmJob, SlurmTask
-from ..utils import replace_wildcard
+from ..utils import flatten_dict
 from .slurm import SlurmSub, SlurmChk
 
 
@@ -62,14 +62,14 @@ class SSlurmChk(SlurmChk):
         if self._from == "conf":
             commands = conf.get(prefix + "_commands", []).copy()
             opts = conf.get(prefix + "_options", []).copy()
-            opts = ["#SBATCH" + opt for opt in opts]
+            opts = ["#SBATCH " + opt for opt in opts]
             if checkid:
                 _id = checkid
             else:
                 _id = jobid
             opts.append("#SBATCH --job-name %s" % _id)
             commands = opts + commands
-        return self._substitue_opts(commands, jobid, checkid)
+        return self._substitue_opts(commands, jobid, checkid, param)
 
     # def _replace_func(self, jobid, checkid, char):
     #     # a second thought: why not unify with {} as format
@@ -97,19 +97,24 @@ class SSlurmChk(SlurmChk):
     #         return conf.get("work_dir", "")
     #     return ""
 
-    def _substitue_opts(self, opts, jobid, checkid=""):
+    def _substitue_opts(self, opts, jobid, checkid="", param=None):
         """
 
         :param opts: lits of strings
         :return:
         """
+        info_dict = flatten_dict(
+            {"conf": conf, "param": param, "jobid": jobid, "checkid": checkid,}
+        )
         for i, opt in enumerate(opts):
-            opts[i] = opt.format(**conf, jobid=jobid, checkid=checkid)
-        return opts
+            opts[i] = opt.format(**info_dict)  # sep="." doesn't work here
         # f-sring is way better for {a[b]} support naturally, but considering py3.5 here...
+        return opts
 
-    def _render_resource(self, jobid, param=None):
-        return {}
+    def _render_resource(self, jobid, checkid="", param=None):
+        res = {}
+        res["job_count"] = 1
+        return res
 
     def _render_check(self, params):
         r = []

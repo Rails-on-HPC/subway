@@ -16,7 +16,7 @@ class SubwayException(Exception):
         self.code = code
 
     def __str__(self):
-        print("%s %s" % (self.__class__.__name__, self.message))
+        return "%s %s" % (self.__class__.__name__, self.message)
 
 
 class CLIException(SubwayException):
