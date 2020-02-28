@@ -4,11 +4,6 @@ from .cons import work_dir
 from .utils import load_json
 
 
-def update_history():
-    with open(conf["history_path"], "w") as f:
-        json.dump(history, f, indent=2)
-
-
 config_path = os.path.join(work_dir, ".subway", "config.json")
 conf = load_json(config_path)
 
@@ -29,3 +24,13 @@ def _conf_abs_dir(prefix):
 
 for prefix in ["inputs", "outputs", "check_inputs", "check_outputs"]:
     _conf_abs_dir(prefix)
+
+
+def update_history():
+    with open(conf["history_path"], "w") as f:
+        json.dump(history, f, indent=2)
+
+
+def update_conf():
+    with open(conf["config_path"], "w") as f:
+        json.dump(conf, f, indent=2)

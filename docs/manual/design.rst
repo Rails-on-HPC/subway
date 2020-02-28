@@ -74,8 +74,12 @@ There are more possibilies of CLI ``subway`` to be explored.
 
 |
 
+
+Relevant json files
+======================
+
 config.json
-=============
+-------------
 
 The reserved configuration keys include:
 
@@ -110,12 +114,11 @@ For example, :mod:`subway.plugins.sslurm` requires extra options, check plugin r
 - ``slurm_options``, ``check_slurm_options``: List[str]. Used in sbatch scripts, lines start with ``#SBATCH``.
 
 
-|
 
 .. _history.json:
 
 history.json
-=============
+---------------
 
 Keys in ``history.json`` are jobids, for each job, there is an information dict, the common keys include:
 
@@ -150,10 +153,13 @@ Again, for plugins, more attributes are expected.  For example, :mod:`subway.plu
 
 |
 
-.. _CSA:
-
 Checker - Submitter Architecture
 =================================
+
+.. _CSA:
+
+Checker and Submitter
+-----------------------
 
 The main loop in entry_point of subway is just running checker and submitter again and again.
 
@@ -185,11 +191,9 @@ The responsibility for the submitter is:
 Throughout all the process, all items and state in :ref:`history.json` shall be carefully dealt with.
 
 
-|
-
 
 Double vs. Single Submitter
-========================================
+------------------------------
 
 We call them DS and SS scheme for simplicity. The difference here is whether check task are managed by submitter.
 Specifically, in the case of slurm submitter, the difference is whether check task is simple and time saving to run inside
@@ -220,3 +224,7 @@ The responsibility for the submitter is:
 
 As we can see, the above workflow parallels DS scheme so that they can share the same super class as the common abstractions.
 Since only step 2 do real submission, compared to step 2,4 in DS scheme, that's why it is called single submitter scheme.
+
+
+General workflow for plain C-S
+---------------------------------

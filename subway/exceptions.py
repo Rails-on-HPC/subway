@@ -32,3 +32,7 @@ class MatchError(CLIException):
 class NoAttribute(CLIException):
     def __init__(self, message, code=13):
         super().__init__(message, code)
+
+
+class EndingBubble(SubwayException):
+    pass

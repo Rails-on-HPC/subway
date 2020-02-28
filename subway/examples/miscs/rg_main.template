@@ -14,9 +14,14 @@ from subway.workflow import main_once, main_rt
 
 from subway.examples import {_sub}, {_chk}
 
+from subway.framework import PreProcessor
+
 
 if __name__ == "__main__":
-    main_rt({_chk}(params=[[3, 0.5], [2, 0.5]], _py="{_py}"), {_sub}(_py="{_py}"), sleep_interval=5)
+    main_rt({_chk}(params=[[3, 0.5], [2, 0.5]], _py="{_py}"),
+            {_sub}(_py="{_py}"),
+            preprocessor=PreProcessor(pipeline=["version_check", "conf_update"]),
+            sleep_interval=5)
 
 
 # _py = current python executable

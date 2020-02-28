@@ -8,13 +8,17 @@ SUBWAY
 **SUBmit jobs in your own WAY**
 
 
-Design Documentation
----------------------
+User Documentation
+-------------------
 
 .. toctree::
    :maxdepth: 2
 
+   manual/user.rst
    manual/design.rst
+   manual/plugin.rst
+
+
 
 
 API Documentation

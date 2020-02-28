@@ -3,8 +3,9 @@ import sys
 import heapq
 from abc import ABC, abstractmethod
 
-from .utils import now_ts
-from .config import history, conf, update_history
+from .utils import now_ts, md5file
+from .config import history, conf, update_history, update_conf
+from .exceptions import EndingBubble
 
 
 class Checker(ABC):
@@ -25,6 +26,22 @@ class Submitter(ABC):
     @abstractmethod
     def __call__(self):
         pass
+
+
+class Processor(ABC):
+    """
+    Base class for processor
+    """
+
+    def __init__(self, pipeline=None, **kwargs):
+        if not pipeline:
+            pipeline = []
+        self.pipeline = pipeline
+        self.kws = kwargs
+
+    def __call__(self):
+        for func in self.pipeline:
+            getattr(self, func)()
 
 
 class PlainChk(Checker):
@@ -115,9 +132,8 @@ class PlainChk(Checker):
             if s["state"] not in end_states:
                 break
         else:
-            if not self.kws.get("test"):
-                print("No active jobs anymore, quitting", file=sys.stderr)
-                exit(0)
+            if not self.kws.get("test"):  # debug for pytest doesn't exit
+                raise EndingBubble(message="all jobs are done")
 
     def post_new_input(self, jobid, resource=None, prev=None):
         """
@@ -488,3 +504,36 @@ class PlainSub(Submitter):
 
     def submit_aborted(self, jobid):
         pass
+
+
+class PreProcessor(Processor):
+    def version_check(self):
+        """
+        Must also include ``update_conf`` into the ``pipeline``
+
+        :return: None
+        """
+        if self.kws.get("version_checking_path"):
+            cp = self.kws.get("version_checking_path")
+            # [(relative path, version number)]
+        else:
+            cp = []
+            for k, v in conf.items():
+                if k.endswith("executable") and conf.get(k + "_version"):
+                    cp.append((v, conf[k + "_version"]))
+
+        conf.setdefault("hashing", {})
+        # hashing: {"main.o": {"1.0.0": "md5agsdhj"}}
+        for p in cp:
+            conf["hashing"].setdefault(p[0], {})
+            f = os.path.join(conf["work_dir"], p[0])
+            if os.path.exists(f):
+                nhash = md5file(f)
+                ohash = conf["hashing"].get(p[0], {}).get(p[1])
+                if ohash:
+                    assert nhash == ohash
+                conf["hashing"][p[0]][p[1]] = nhash
+
+    @staticmethod
+    def conf_update():
+        update_conf()

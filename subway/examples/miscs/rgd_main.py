@@ -14,8 +14,13 @@ from subway.workflow import main_once, main_rt
 
 from subway.examples import RgDSub, RgDChk
 
+from subway.framework import PreProcessor
+
 
 if __name__ == "__main__":
     main_rt(
-        RgDChk(_py="python", params=[[3, 0.5], [2, 0.4]]), RgDSub(), sleep_interval=3
+        RgDChk(_py="python", params=[[3, 0.5], [2, 0.4]]),
+        RgDSub(),
+        preprocessor=PreProcessor(pipeline=["version_check", "conf_update"]),
+        sleep_interval=3,
     )
