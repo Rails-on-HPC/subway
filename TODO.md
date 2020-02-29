@@ -9,6 +9,7 @@
 - [ ] increase task coverage for future CI and collaboration
 - [x] add pre and post hooks for main
 - [ ] more neat exception hierachy and code assignment
+- [ ] more on fault tolerance and compatible beyond check_, (eg, resolve_)
 
 ## Small tweaks
 - [x] absorted state and absorting_ts for tasks in history.json
@@ -20,4 +21,5 @@
 ## Thoughts and discussions
 
 - [ ] input and output information: write in history.json or keep the convention, which is better?
+- [ ] is there, by any chance, keyboard interrupt of main_rt would make things confused when run main_rt again?
 - [x] add mechanism that one can manually add job naturally (seems current setup is good enough for this, just run kickstart again at anytime)

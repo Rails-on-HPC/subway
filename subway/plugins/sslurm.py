@@ -12,6 +12,7 @@ from ..config import conf, history
 from ..components import SlurmJob, SlurmTask
 from ..utils import flatten_dict
 from .slurm import SlurmSub, SlurmChk
+from ..components.genfiles import generate_file
 
 
 class SSlurmSub(SlurmSub):
@@ -34,7 +35,7 @@ class SSlurmChk(SlurmChk):
         """
 
         :param params:
-        :param _from: str. conf, template or others
+        :param _from: str. conf, template.
         :param kwargs:
         """
         self._from = _from
@@ -51,25 +52,47 @@ class SSlurmChk(SlurmChk):
         """
         pass
 
-    def _render_sbatch(self, jobid, param=None):
-        SlurmTask(
-            sbatch_path=os.path.join(conf["inputs_abs_dir"], jobid + ".sh"),
-            sbatch_commands=self._render_commands(jobid, param=param),
-            # sbatch_options=self._render_options(jobid, param),
-        )
+    def _render_sbatch(self, jobid, checkid="", param=None, prefix=""):
+        if not prefix:
+            _sbatch_path = os.path.join(conf["inputs_abs_dir"], jobid + ".sh")
+        else:
+            _sbatch_path = os.path.join(
+                conf[prefix + "inputs_abs_dir"], checkid + ".sh"
+            )
+        if self._from == "conf":
+            SlurmTask(
+                sbatch_path=_sbatch_path,
+                sbatch_commands=self._render_commands(jobid, checkid, param=param),
+            )
+
+        elif self._from == "template":
+            _sbatch_template = os.path.join(
+                conf["work_dir"], conf[prefix + "slurm_template"]
+            )
+            info_dict = flatten_dict(
+                {"conf": conf, "param": param, "jobid": jobid, "checkid": checkid,}
+            )
+            generate_file(
+                info_dict, output_path=_sbatch_path, output_template=_sbatch_template
+            )
+            SlurmTask(sbatch_path=_sbatch_path)
+
+        else:
+            raise ValueError("_from must be conf or template")
 
     def _render_commands(self, jobid, checkid="", param=None, prefix="slurm"):
-        if self._from == "conf":
-            commands = conf.get(prefix + "_commands", []).copy()
-            opts = conf.get(prefix + "_options", []).copy()
-            opts = ["#SBATCH " + opt for opt in opts]
-            if checkid:
-                _id = checkid
-            else:
-                _id = jobid
-            opts.append("#SBATCH --job-name %s" % _id)
-            commands = opts + commands
-        return self._substitue_opts(commands, jobid, checkid, param)
+        commands = conf.get(prefix + "_commands", []).copy()
+        opts = conf.get(prefix + "_options", []).copy()
+        opts = ["#SBATCH " + opt for opt in opts]
+        if checkid:
+            _id = checkid
+        else:
+            _id = jobid
+        opts.append("#SBATCH --job-name %s" % _id)
+        commands = opts + commands
+        return self._substitue_opts(
+            opts=commands, jobid=jobid, checkid=checkid, param=param
+        )
 
     # def _replace_func(self, jobid, checkid, char):
     #     # a second thought: why not unify with {} as format
@@ -106,6 +129,7 @@ class SSlurmChk(SlurmChk):
         info_dict = flatten_dict(
             {"conf": conf, "param": param, "jobid": jobid, "checkid": checkid,}
         )
+        # print(info_dict)
         for i, opt in enumerate(opts):
             opts[i] = opt.format(**info_dict)  # sep="." doesn't work here
         # f-sring is way better for {a[b]} support naturally, but considering py3.5 here...
@@ -120,9 +144,9 @@ class SSlurmChk(SlurmChk):
         r = []
         for param in params:
             jobid = self._render_newid()
-            self._render_input(jobid, param)
-            self._render_sbatch(jobid, param)
-            r.append((jobid, self._render_resource(jobid, param)))
+            self._render_input(jobid=jobid, param=param)
+            self._render_sbatch(jobid=jobid, param=param)
+            r.append((jobid, self._render_resource(jobid=jobid, param=param)))
         return r
 
     def _render_newid(self):

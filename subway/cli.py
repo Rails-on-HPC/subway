@@ -486,6 +486,19 @@ class SubwayCLI:
             os.path.join(self.args.dir, "run.py"),
         )
 
+    def _render_sbatch_template(self, mainpath, checkpath=None, subwaypath=None):
+        if not subwaypath:
+            subwaypath = self._subway_path
+        if checkpath:
+            shutil.copyfile(
+                os.path.join(subwaypath, "examples", "miscs", checkpath),
+                os.path.join(self.args.dir, "check_sbatch.template"),
+            )
+        shutil.copyfile(
+            os.path.join(subwaypath, "examples", "miscs", mainpath),
+            os.path.join(self.args.dir, "sbatch.template"),
+        )
+
     def debug(self):
         if self.args.object == "history":
             if self.args.action in ["clear", "clean"]:
@@ -526,6 +539,9 @@ class SubwayCLI:
                     var_dict,
                 )
                 self._render_run_check("rg_run.py", "rg_check.py")
+                self._render_sbatch_template(
+                    "rg_sbatch.template", "rg_check_sbatch.template"
+                )
 
             elif self.args.action == "rgs":
                 conf = load_json(
@@ -544,6 +560,7 @@ class SubwayCLI:
                     var_dict,
                 )
                 self._render_run_check("rg_run.py")
+                self._render_sbatch_template("rg_sbatch.template")
 
             elif self.args.action == "rgl":
                 conf = load_json(

@@ -1,0 +1,6 @@
+#! /bin/bash
+#SBATCH -N 1
+#SBATCH -n 1
+#SBATCH --job-name {checkid} # must have line!!!
+
+{conf~_py} {conf~work_dir}/{conf~check_executable} {conf~check_inputs_abs_dir}/{checkid} {conf~check_outputs_abs_dir}/{checkid}

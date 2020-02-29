@@ -95,12 +95,17 @@ The reserved configuration keys include:
 
 - ``executable_version``, ``check_executable version``: str. Script versions for main and check executables. (omitted is ok)
 
+- ``executable``: str, relpath. The binary path for main task. (omitted is ok)
 
-The recommended keys conventions include:
+- ``check_executable``: str, relpath. The binary path for check task. (omitted is ok)
 
-- ``executable``: str, relpath. The binary path for main task.
+- ``_py``: str. Abs path for preferred python binary.
 
-- ``check_executable``: str, relpath. The binary path for check task (if any).
+-   ``_executable``: str. All keys end with executable are reserved.
+
+- ``_version``: str. All keys end with version are reserved.
+
+- ``_template``: str. All keys end with template are reserved.
 
 
 Note all path above in config are relative path compared to ``work_dir``, which is the only absolute path.

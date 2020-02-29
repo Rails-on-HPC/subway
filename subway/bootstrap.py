@@ -1,7 +1,10 @@
 """
 actions when sub init in cli, including mkdir, touch files and render templates in templates fold
 """
-import os, sys, json, shutil
+import os
+import sys
+import json
+import shutil
 
 ## note conf here is not from config.json, since there is no such file at the phase
 ## the source of the conf here should be interactive cli or specify json file from sub init -f config.json
@@ -44,6 +47,7 @@ def default_conf(path):
     conf["work_dir"] = path  # not necessary, can serve as a double check
     conf["resource_limit"] = {}
     conf["entry_point"] = "main.py"
+    conf["_py"] = sys.executable
     return conf
 
 

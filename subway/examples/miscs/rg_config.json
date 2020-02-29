@@ -25,5 +25,7 @@
   ],
   "check_slurm_commands":[
     "{conf~_py} {conf~work_dir}/{conf~check_executable} {conf~check_inputs_abs_dir}/{checkid} {conf~check_outputs_abs_dir}/{checkid}"
-  ]
+  ],
+  "slurm_template": "sbatch.template",
+  "check_slurm_template": "check_sbatch.template"
 }

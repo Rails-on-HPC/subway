@@ -42,38 +42,36 @@ class DSlurmChk(SSlurmChk):
         """
         pass
 
-    def _render_check_sbatch(self, jobid, checkid, param=None):
-        SlurmTask(
-            sbatch_path=os.path.join(
-                conf["work_dir"], conf["check_inputs_dir"], checkid + ".sh"
-            ),
-            sbatch_commands=self._render_commands(
-                jobid, checkid=checkid, param=param, prefix="check_slurm"
-            ),
-            # sbatch_options=self._render_check_options(jobid, checkid, param),
-        )
-
     def _render_check(self, params, jobid=None, _type="main"):
         if _type == "main":
             r = []
             for param in params:
                 jobid = self._render_newid()
-                self._render_input(jobid, param)
-                self._render_sbatch(jobid, param)
-                r.append((jobid, self._render_resource(jobid, param)))
+                self._render_input(jobid=jobid, param=param)
+                self._render_sbatch(jobid=jobid, param=param)
+                r.append((jobid, self._render_resource(jobid=jobid, param=param)))
             return r
         elif _type == "check":
             if params:
                 assert len(params) == 1
                 param = params[0]
                 checkid = self._render_newid()
-                self._render_check_input(jobid, checkid, param)
-                self._render_check_sbatch(jobid, checkid, param)
-                return [(checkid, self._render_resource(jobid, checkid, param))]
+                self._render_check_input(jobid=jobid, checkid=checkid, param=param)
+                self._render_sbatch(
+                    jobid=jobid, checkid=checkid, param=param, prefix="check_"
+                )
+                return [
+                    (
+                        checkid,
+                        self._render_resource(
+                            jobid=jobid, checkid=checkid, param=param
+                        ),
+                    )
+                ]
 
     def check_finished(self, jobid):  # should generate check input and check sbatch
         params = self.check_finished_main(jobid)
-        return self._render_check(params, jobid=jobid, _type="check")
+        return self._render_check(params=params, jobid=jobid, _type="check")
 
     @abstractmethod
     def check_finished_main(self, jobid):
