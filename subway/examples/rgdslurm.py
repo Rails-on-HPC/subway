@@ -11,10 +11,15 @@ class RgDSub(DSlurmSub):
 
 
 class RgDChk(DSlurmChk):
-    def _render_input(self, jobid, param):
-        L, l = param
-        with open(os.path.join(conf["inputs_abs_dir"], jobid), "w") as f:
-            f.writelines(["%s\n%s" % (L, l)])
+    def _render_input(self, jobid, checkid="", param=None, prefix=""):
+        if not prefix:
+            super()._render_input(jobid, checkid, param, prefix)
+        else:  # check input
+            with open(os.path.join(conf["inputs_abs_dir"], jobid), "r") as f:
+                _, l = f.readlines()
+            l = float(l)
+            with open(os.path.join(conf["check_inputs_abs_dir"], checkid), "w") as f:
+                f.writelines(["%s\n%s" % (l, param)])
 
     def check_checking_main(self, jobid):
         with open(

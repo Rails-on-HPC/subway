@@ -9,11 +9,6 @@ class RgSSub(SSlurmSub):
 
 
 class RgSChk(SSlurmChk):
-    def _render_input(self, jobid, param):
-        L, l = param
-        with open(os.path.join(conf["inputs_abs_dir"], jobid), "w") as f:
-            f.writelines(["%s\n%s" % (L, l)])
-
     def check_checking_main(self, jobid):
         with open(os.path.join(conf["inputs_abs_dir"], jobid), "r") as f:
             L, l = f.readlines()

@@ -41,28 +41,52 @@ class SSlurmChk(SlurmChk):
         self._from = _from
         super().__init__(params, **kwargs)
 
-    @abstractmethod
-    def _render_input(self, jobid, param):
+    def _render_input(self, jobid, checkid="", param=None, prefix=""):
         """
-        generate input files based on jobid and param
+        generate input files based on jobid and param.
+        The default impl can render param to input.template.
+        But this is not general enough for all user case,
+        the user can simply rewrite this method.
 
-        :param jobid:
-        :param param:
-        :return:
+        :param jobid: str.
+        :param param: Unoin[Dict, List, Tuple].
+        :return: None.
         """
-        pass
+        info_dict = flatten_dict(
+            {"conf": conf, "param": param, "jobid": jobid, "checkid": checkid,}
+        )
+        if not prefix:
+            if conf.get("input_template"):
+                generate_file(
+                    data=flatten_dict(info_dict),
+                    output_path=os.path.join(conf["inputs_abs_dir"], jobid),
+                    output_template=os.path.join(
+                        conf["work_dir"], conf["input_template"]
+                    ),
+                )
+        elif prefix == "check_":
+            if conf.get(prefix + "input_template"):
+                generate_file(
+                    data=flatten_dict(info_dict),
+                    output_path=os.path.join(conf[prefix + "inputs_abs_dir"], checkid),
+                    output_template=os.path.join(
+                        conf["work_dir"], conf[prefix + "input_template"]
+                    ),
+                )
 
     def _render_sbatch(self, jobid, checkid="", param=None, prefix=""):
         if not prefix:
             _sbatch_path = os.path.join(conf["inputs_abs_dir"], jobid + ".sh")
-        else:
+        elif prefix == "check_":
             _sbatch_path = os.path.join(
                 conf[prefix + "inputs_abs_dir"], checkid + ".sh"
             )
         if self._from == "conf":
             SlurmTask(
                 sbatch_path=_sbatch_path,
-                sbatch_commands=self._render_commands(jobid, checkid, param=param),
+                sbatch_commands=self._render_commands(
+                    jobid=jobid, checkid=checkid, param=param, prefix=prefix
+                ),
             )
 
         elif self._from == "template":
@@ -80,9 +104,9 @@ class SSlurmChk(SlurmChk):
         else:
             raise ValueError("_from must be conf or template")
 
-    def _render_commands(self, jobid, checkid="", param=None, prefix="slurm"):
-        commands = conf.get(prefix + "_commands", []).copy()
-        opts = conf.get(prefix + "_options", []).copy()
+    def _render_commands(self, jobid, checkid="", param=None, prefix=""):
+        commands = conf.get(prefix + "slurm_commands", []).copy()
+        opts = conf.get(prefix + "slurm_options", []).copy()
         opts = ["#SBATCH " + opt for opt in opts]
         if checkid:
             _id = checkid

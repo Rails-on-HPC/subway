@@ -76,6 +76,7 @@ class SubwayCLI:
         debugparser.add_argument(
             dest="action", help="action for debug", nargs="?", default=None
         )
+        debugparser.add_argument("-f", "--from", dest="_from", default="template")
         # TODO: automatic way to add help for subparser, eg. decorator of query funcs
         # TODO: plugable subcommands, eg slurm
         self.parser = parser
@@ -530,7 +531,12 @@ class SubwayCLI:
                 )
                 conf["_py"] = sys.executable
                 env_init(self.args.dir, conf, include_main=False)
-                var_dict = {"_py": sys.executable, "_sub": "RgDSub", "_chk": "RgDChk"}
+                var_dict = {
+                    "_py": sys.executable,
+                    "_sub": "RgDSub",
+                    "_chk": "RgDChk",
+                    "_from": self.args._from,
+                }
                 simple_template_render(
                     os.path.join(
                         self._subway_path, "examples", "miscs", "rg_main.template"
@@ -542,6 +548,12 @@ class SubwayCLI:
                 self._render_sbatch_template(
                     "rg_sbatch.template", "rg_check_sbatch.template"
                 )
+                shutil.copy(
+                    os.path.join(
+                        self._subway_path, "examples", "miscs", "rg_input.template"
+                    ),
+                    os.path.join(self.args.dir, "input.template"),
+                )
 
             elif self.args.action == "rgs":
                 conf = load_json(
@@ -551,7 +563,12 @@ class SubwayCLI:
                 )
                 conf["_py"] = sys.executable
                 env_init(self.args.dir, conf, include_main=False)
-                var_dict = {"_py": sys.executable, "_sub": "RgSSub", "_chk": "RgSChk"}
+                var_dict = {
+                    "_py": sys.executable,
+                    "_sub": "RgSSub",
+                    "_chk": "RgSChk",
+                    "_from": self.args._from,
+                }
                 simple_template_render(
                     os.path.join(
                         self._subway_path, "examples", "miscs", "rg_main.template"
@@ -561,6 +578,12 @@ class SubwayCLI:
                 )
                 self._render_run_check("rg_run.py")
                 self._render_sbatch_template("rg_sbatch.template")
+                shutil.copy(
+                    os.path.join(
+                        self._subway_path, "examples", "miscs", "rg_input.template"
+                    ),
+                    os.path.join(self.args.dir, "input.template"),
+                )
 
             elif self.args.action == "rgl":
                 conf = load_json(
@@ -570,7 +593,12 @@ class SubwayCLI:
                 )
                 conf["_py"] = sys.executable
                 env_init(self.args.dir, conf, include_main=False)
-                var_dict = {"_py": sys.executable, "_sub": "RgSub", "_chk": "RgChk"}
+                var_dict = {
+                    "_py": sys.executable,
+                    "_sub": "RgSub",
+                    "_chk": "RgChk",
+                    "_from": self.args._from,
+                }
                 simple_template_render(
                     os.path.join(
                         self._subway_path, "examples", "miscs", "rg_main.template"

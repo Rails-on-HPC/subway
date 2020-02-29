@@ -31,17 +31,6 @@ class DSlurmChk(SSlurmChk):
     and specifically check_checking_main
     """
 
-    @abstractmethod
-    def _render_check_input(self, jobid, checkid, param):
-        """
-        generate input files based on jobid and param
-
-        :param jobid:
-        :param param:
-        :return:
-        """
-        pass
-
     def _render_check(self, params, jobid=None, _type="main"):
         if _type == "main":
             r = []
@@ -56,7 +45,9 @@ class DSlurmChk(SSlurmChk):
                 assert len(params) == 1
                 param = params[0]
                 checkid = self._render_newid()
-                self._render_check_input(jobid=jobid, checkid=checkid, param=param)
+                self._render_input(
+                    jobid=jobid, checkid=checkid, param=param, prefix="check_"
+                )
                 self._render_sbatch(
                     jobid=jobid, checkid=checkid, param=param, prefix="check_"
                 )

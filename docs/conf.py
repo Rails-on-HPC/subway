@@ -47,6 +47,16 @@ release = ""
 extensions = ["sphinx.ext.todo", "sphinx.ext.autodoc", "sphinx.ext.viewcode"]
 # ext.viewcode is used to attach [source] link alongside API docs
 
+# see config at : https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#confval-autodoc_default_options
+autodoc_default_options = {
+    "members": True,
+    # 'member-order': 'bysource',
+    "special-members": "__init__, __call__",
+    "undoc-members": True,
+    "private-members": True,
+    "undoc-members": True,
+    "exclude-members": "__weakref__, _abc_cache, _abc_negative_cache, _abc_negative_cache_version,_abc_registry",
+}
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 

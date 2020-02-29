@@ -21,6 +21,18 @@ def test_config(capsys):
         )
         + "\n"
     )
+    argv2 = ["-d", work_path, "config", "edit"]
+    cl = SubwayCLI(_argv=argv2)
+    cl()
+
+
+def test_init(tmpdir):
+    argv = ["-d", tmpdir, "init"]
+    cl = SubwayCLI(_argv=argv)
+    cl()
+    argv = ["-d", tmpdir, "d", "reinit"]
+    cl = SubwayCLI(_argv=argv)
+    cl()
 
 
 def test_query_root(capsys):
