@@ -1,2 +1,5 @@
 __version__ = (0, 0, 1)
 version = ".".join([str(n) for n in __version__])
+__title__ = 'subway'
+__description__ = "SUBmit your jobs in your own WAY"
+__license__ = 'MIT'

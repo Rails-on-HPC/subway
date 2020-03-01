@@ -54,7 +54,6 @@ autodoc_default_options = {
     "special-members": "__init__, __call__",
     "undoc-members": True,
     "private-members": True,
-    "undoc-members": True,
     "exclude-members": "__weakref__, _abc_cache, _abc_negative_cache, _abc_negative_cache_version,_abc_registry",
 }
 # Add any paths that contain templates here, relative to this directory.
@@ -97,10 +96,11 @@ html_theme = "alabaster"
 # documentation.
 #
 html_theme_options = {
-    "github_user": "refraction-ray",
+    "github_user": "Rails-on-HPC",
     "github_repo": "subway",
     "github_button": "true",
-    "github_banner": "true",
+    "github_type": "star",
+    "github_banner": "flase",
     "show_powered_by": "false",
 }
 

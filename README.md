@@ -3,9 +3,9 @@ SUBWAY
 
 SUBmit jobs in your own WAY.
 
-## Howto
 
-### Install
+
+## Install
 
 * `python3 setup.py install`
 
@@ -13,6 +13,8 @@ SUBmit jobs in your own WAY.
 `export PATH=$SUBWAY_PATH:$PATH` as well as `export SUBWAY_PYTHON=python of your choice`, 
 default is `python3`.
 
+
+## Howto
 
 ### Simple Slurm Example
 

@@ -3,7 +3,7 @@
 - [ ] good abstraction on resource management (tmp files can also be a resource!)
 - [x] slurm plugin for check and submit
 - [x] exit of main if all jobs are checked
-- [ ] docs for code
+- [x] docs for code
 - [ ] manuals for cli
 - [ ] more sophisticated print or logger system
 - [x] increase task coverage for future CI and collaboration
@@ -19,7 +19,7 @@
 - [x] strict version fix checking by hashing the file
 - [x] default job_count limitation (one line impl in sslurm)
 - [x] add option on sslurm plugin for directly rendering files ``_from="template"``
-- [ ] node list tracking
+- [ ] node list tracking for slurmoo
 
 ## Thoughts and discussions
 
