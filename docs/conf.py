@@ -100,7 +100,7 @@ html_theme_options = {
     "github_repo": "subway",
     "github_button": "true",
     "github_type": "star",
-    "github_banner": "flase",
+    "github_banner": "true",
     "show_powered_by": "false",
 }
 

@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 from subway import version, __description__, __license__
 
 
@@ -10,7 +10,7 @@ if __name__ == "__main__":
     setup(
         name="hpcsubway",
         version=version,
-        packages=["subway"],
+        packages=find_packages(),
         description=__description__,
         license=__license__,
         long_description=readme,

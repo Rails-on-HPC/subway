@@ -4,11 +4,12 @@ SUBWAY
 SUBmit jobs in your own WAY.
 
 ![Github Action](https://github.com/Rails-on-HPC/subway/workflows/tests/badge.svg)
-
 [![Documentation Status](https://readthedocs.org/projects/subway/badge/?version=latest)](https://subway.readthedocs.io/en/latest/?badge=latest)
 
 
 ## Install
+
+* `pip install hpcsubway`
 
 * `python3 setup.py install`
 
@@ -39,7 +40,7 @@ make html
 
 The generated html docs are living in ``subway/docs/_build/html``.
 
-Or the online doc is hosted at:
+Or just check the online doc hosted in [readthedocs](https://subway.readthedocs.io/).
 
 ## Tests
 
