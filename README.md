@@ -3,6 +3,9 @@ SUBWAY
 
 SUBmit jobs in your own WAY.
 
+![Github Action](https://github.com/Rails-on-HPC/subway/workflows/tests/badge.svg)
+
+[![Documentation Status](https://readthedocs.org/projects/subway/badge/?version=latest)](https://subway.readthedocs.io/en/latest/?badge=latest)
 
 
 ## Install

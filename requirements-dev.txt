@@ -1,0 +1,4 @@
+pytest
+pytest-cov
+sphinx==2.4.3
+black==19.10b0

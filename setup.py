@@ -2,7 +2,7 @@ from setuptools import setup
 from subway import version, __description__, __license__
 
 
-with open("README.md", "r", "utf-8") as f:
+with open("README.md", "r", encoding="utf-8") as f:
     readme = f.read()
 
 
