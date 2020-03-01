@@ -1,6 +1,7 @@
 """
 Forest of multiple trees of tasks
 """
+
 from .exceptions import MatchError
 
 
@@ -27,6 +28,7 @@ class HTree:
 
     def parent(self, jobid, n=1):
         """
+        n-level parent task id
 
         :param jobid:
         :param n: n<=0 for the ultimate root
@@ -45,6 +47,11 @@ class HTree:
         return self.parent(p1, n - 1)
 
     def roots(self):
+        """
+        Find all jobs with no parent.
+
+        :return: List[str]. jobid list
+        """
         if self.roots_list is not None:
             return self.roots_list
         r = []
@@ -91,6 +98,12 @@ class HTree:
         return r
 
     def DFSvisit(self, jobid):
+        """
+        generator yield job by DFS across the tree rooted as ``jobid``
+
+        :param jobid: str.
+        :yield: Next job id by DFS.
+        """
         yield jobid
         for nid in self.history[jobid]["next"]:
             yield from self.DFSvisit(nid)
@@ -109,6 +122,16 @@ class HTree:
         return l
 
     def print_tree(self, jobid, file=None, _prefix="", _last=True, _show=0):
+        """
+        print a tree to stdout with root as ``jobid``
+
+        :param jobid: str.
+        :param file: args for ``file=`` in ``print``. Default None to stdout.
+        :param _prefix:
+        :param _last:
+        :param _show:
+        :return:
+        """
         print(
             _prefix,
             "`- " if _last else "|- ",

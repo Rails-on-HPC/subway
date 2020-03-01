@@ -31,6 +31,11 @@ Design Philosophy
 CLI utility
 ===========
 
+.. _clioverview:
+
+An overview
+-------------
+
 The CLI command ``subway`` is ready to use if subway is install by ``pip`` or ``python setup.py install``.
 If the users cannot or don't want to install subway via setup system, the package still works as standalone one.
 To enable CLI support in this case, one need to:
@@ -69,14 +74,56 @@ The power of CLI tool is illustrated below:
         $ subway query root
         # print all root jobs
 
-There are more possibilies of CLI ``subway`` to be explored.
 
+CLI commands
+--------------
+
+There are more possibilies of CLI ``subway`` to be explored. In summary, there are the following parts for subway CLI:
+
+- ``subway init``: Init a subway project.
+
+- ``subway run``: Run the subway project by entry point.
+
+- ``subway config``: ``show`` or ``edit`` config of the subway project.
+
+- ``subway query``: The most powerful interface on analysing jobs based on ``history.json``.
+
+- ``subway debug``: Some useful shortcuts for debugging and quick testing.
+
+It is worthing noting shortcuts such as ``subway r``, ``subway c`` also work.
+
+Query interface
+------------------
+
+For ``subway q``, the most general query statement is by ``-s``, as we have seen in :ref:`overview <clioverview>`.
+
+The statement follows ``-s`` is made of several equations, such as "state=pending; checking_tso<datetime(2020,2,2,20,2,20)".
+These conditions separates with ";" and possible space. The sign supported include "=", ">", "<", ">=", "<=", "<>".
+
+The last one means unequal. ">" and "<" sign has special meanings when list is involved. For example, ``subway q -s prev<["1", "2"]``
+finds jobs whose prev attr is either 1 or 2. On the other hand ``subway q -s next>1`` finds jobs whose next attr (a list) include 1.
+
+Subway will detect jobs satisfy all conditions at the same time. The attributes are with the same name as in ``history.json``.
+The higher order attributes can be accessed with "." notation. For example, to query ``cpu_count`` in ``resource``, we can
+use ``subway query -s "resource.cpu_count>2"``.
+
+Beyond these attributes, there are also some special attribute query statement supports. These attrs ends with "_ts" are extended
+to attrs with "_tso" where python datetime object is obtained and can be compared directly in the form as ``checking_tso<datetime(2020,2,2,20,2,20)``.
+
+
+``subway query`` has other powerful short cuts beyond ``-s``.
+``subway query tree`` print job trees of the subject.
+``subway -j <jobid> input`` shows input for <jobid>. It is also handy that we only need to write down the very beginning part of a long jobid.
+The full jobid can be automatically matched and used.
+``subway -j <jobid> ending_time`` shows the ``ending_ts`` for <jobid> in human readable way instead of timestamp.
 
 |
 
 
 Relevant json files
 ======================
+
+.. _config.json:
 
 config.json
 -------------
@@ -196,6 +243,7 @@ The responsibility for the submitter is:
 Throughout all the process, all items and state in :ref:`history.json` shall be carefully dealt with.
 
 
+.. _dsss:
 
 Double vs. Single Submitter
 ------------------------------
@@ -233,3 +281,9 @@ Since only step 2 do real submission, compared to step 2,4 in DS scheme, that's 
 
 General workflow for plain C-S
 ---------------------------------
+
+
+Exceptions
+==============
+
+Table between exceptions and codes

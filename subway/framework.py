@@ -1,3 +1,7 @@
+"""
+Basic classes: submitter, checker and processor for subway main loop
+"""
+
 import os
 import sys
 import heapq
@@ -34,6 +38,11 @@ class Processor(ABC):
     """
 
     def __init__(self, pipeline=None, **kwargs):
+        """
+
+        :param pipeline: List[str]. List of str of method name that processor will run one by one.
+        :param kwargs:
+        """
         if not pipeline:
             pipeline = []
         self.pipeline = pipeline
@@ -388,8 +397,7 @@ class PlainSub(Submitter):
     The very general submitter class.
     """
 
-    def __init__(self, resource_limit=None, **kwargs):
-        self.resource_limit = resource_limit  ## dict here, {"job": 2}
+    def __init__(self, **kwargs):
         self.pending_queue = []
         self.finished_queue = []
         self.aborted_queue = []
@@ -397,6 +405,11 @@ class PlainSub(Submitter):
         self.kws = kwargs
 
     def __call__(self):
+        """
+        `DIY: not recommend.`
+
+        :return:
+        """
         self.is_queue = False  ## fix of realtime update for submitter
         while not self.is_restricted():
             t = self.priority_task()
@@ -430,9 +443,12 @@ class PlainSub(Submitter):
 
     def priority_task(self):
         """
-        choose the first task to be run from pending inputs queue
+        `DIY: depends.`
+        The default impl prefer jobs in aborted state, then finished state and finally pending state.
+        Plus, the default impl prefer older jobs.
+        choose the first task to be run from pending, finished and aborted queue
 
-        :return: jobid
+        :return: str, jobid.
         """
         if self.is_queue is False:
             for f, s in history.items():
@@ -454,9 +470,11 @@ class PlainSub(Submitter):
 
     def is_restricted(self):
         """
-        check the restriction is ok for now with all running tasks in consideration
+        `DIY: depends.`
+        The default impl is ok if you only want to restrict some resource in simple and soft way.
+        check the restriction is ok for now with all running tasks in consideration.
 
-        :return:
+        :return: bool. whether the total resource limit is reached.
         """
         # the default pattern: for each job, possible keys are *_count in history resource or check_resource
         # compare these with items *_limit in resource_limit in config
@@ -479,10 +497,12 @@ class PlainSub(Submitter):
 
     def submit_job(self, jobid):
         """
-        submit job, for example, generate sbatch file and submit it to slurm
+        `DIY: not recommend`.
+        submit job, for example, generate sbatch file and submit it to slurm.
+        This method automaticall dispatch to :meth:`submit_pending`, :meth:`submit_finished` and :meth:`submit_aborted`.
         
-        :param jobid:
-        :return:
+        :param jobid: str.
+        :return: None.
         """
         s = history[jobid]["state"]
         if s == "pending":
@@ -497,19 +517,42 @@ class PlainSub(Submitter):
 
     @abstractmethod
     def submit_pending(self, jobid):
+        """
+        `DIY: must.`
+        The very core of submitter class. It describes how do you define submitting a job.
+
+        :param jobid: str.
+        :return:
+        """
         pass
 
     def submit_finished(self, jobid):
+        """
+        `DIY: depends.`
+        If you have to deal with DS scheme as in :ref:`dsss`, then you must implement this method.
+
+        :param jobid: str.
+        :return:
+        """
         pass
 
     def submit_aborted(self, jobid):
+        """
+        `DIY: depends.`
+        If you have to deal with DS scheme as in :ref:`dsss` together with fault tolerance, then you must implement this method.
+
+        :param jobid: str.
+        :return:
+        """
         pass
 
 
 class PreProcessor(Processor):
     def version_check(self):
         """
-        Must also include ``update_conf`` into the ``pipeline``
+        Must also include :meth:`update_conf` into the ``pipeline``.
+        Lock the binary version with hashing, ensure different binary cannot be run
+        unless the version is changed in ``config.json``/
 
         :return: None
         """
@@ -531,9 +574,16 @@ class PreProcessor(Processor):
                 nhash = md5file(f)
                 ohash = conf["hashing"].get(p[0], {}).get(p[1])
                 if ohash:
-                    assert nhash == ohash
+                    assert (
+                        nhash == ohash
+                    )  # TODO: the exception is to be wrapped in a better presentation
                 conf["hashing"][p[0]][p[1]] = nhash
 
     @staticmethod
     def conf_update():
+        """
+        Write ``conf`` in memory back to ``config.json``.
+
+        :return: None.
+        """
         update_conf()

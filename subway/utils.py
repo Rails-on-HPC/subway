@@ -1,3 +1,7 @@
+"""
+some utilities and helper function with no inner dependence
+"""
+
 import os
 import re
 import sys
@@ -144,7 +148,7 @@ def _recover_type(v):
     """
     recover "17" to 17.
     recover "[]" to [].
-    recover "datetime(2020,1,1)" to datetime(2020,1,1)
+    recover "datetime(2020,1,1)" to datetime(2020,1,1).
     keep "abc" as str.
 
     :param v: str.
@@ -161,7 +165,7 @@ def _recover_type(v):
 
 def _replace(replace_func, s):
     """
-    inner function for :py:function:`replace_wildcard`
+    inner function for :py:func:`replace_wildcard`
 
     :param replace_func: Callable[[char], char].
         Char to char function. eg f(a) = A, indicates %a should be replaced by A.

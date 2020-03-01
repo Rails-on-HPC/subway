@@ -1,3 +1,7 @@
+"""
+Main loop function for subway entry_point
+"""
+
 import time
 import sys
 

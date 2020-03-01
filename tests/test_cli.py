@@ -21,9 +21,9 @@ def test_config(capsys):
         )
         + "\n"
     )
-    argv2 = ["-d", work_path, "config", "edit"]
-    cl = SubwayCLI(_argv=argv2)
-    cl()
+    # argv2 = ["-d", work_path, "config", "edit"]
+    # cl = SubwayCLI(_argv=argv2)
+    # cl()
 
 
 def test_init(tmpdir):

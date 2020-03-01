@@ -27,7 +27,7 @@ API Documentation
 .. toctree::
    :maxdepth: 2
    
-   modules.rst
+   api/subway
 
 
 Release and Version History

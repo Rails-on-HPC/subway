@@ -8,9 +8,9 @@ class SubwayException(Exception):
     def __init__(self, message, code=10):
         """
 
-        :param message:
-        :param code: 10 general, 11 jobid unmatch, 12 only valid for general without id
-        13 no such atrribute in history of conf
+        :param message: str.
+        :param code: int. 10 general, 11 jobid unmatch, 12 only valid for general without id
+            13 no such atrribute in history of conf
         """
         self.message = message
         self.code = code

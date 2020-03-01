@@ -68,7 +68,8 @@ class DSlurmChk(SSlurmChk):
     def check_finished_main(self, jobid):
         """
 
-        :param jobid:
-        :return: [(checkid, check_resource)]
+        :param jobid: str.
+        :return: List[Tuple[str, Dict[str, Any]]]. The length of the list must be 0 or 1.
+                ``[(checkid, check_resource)]``
         """
         return []

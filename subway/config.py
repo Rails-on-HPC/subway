@@ -1,3 +1,7 @@
+"""
+import config from ``config.json``
+"""
+
 import os
 import json
 from .cons import work_dir
@@ -27,10 +31,20 @@ for prefix in ["inputs", "outputs", "check_inputs", "check_outputs"]:
 
 
 def update_history():
+    """
+    write ``history`` in memory back to ``history.json``.
+
+    :return: None.
+    """
     with open(conf["history_path"], "w") as f:
         json.dump(history, f, indent=2)
 
 
 def update_conf():
+    """
+    write ``conf`` in memory back to ``config.json``.
+
+    :return: None.
+    """
     with open(conf["config_path"], "w") as f:
         json.dump(conf, f, indent=2)

@@ -405,18 +405,22 @@ class SubwayCLI:
     def _meta_query_key(self, key):
         """
         meta function to generate member function for this class, generate function as follows
-        # def query_checked(self):
-        #     if self.jid:
-        #         print("1" if self.history[self.jid]['state'] == "checked" else "0")
-        #     else:
-        #         r = []
-        #         for j, s in self.history.items():
-        #             if s['state'] == "checked":
-        #                 r.append(j)
-        #         print(*r, sep="\n")
 
-        :param key:
-        :return:
+        .. code-block:: python
+
+            def query_checked(self):
+                if self.jid:
+                    print("1" if self.history[self.jid]['state'] == "checked" else "0")
+                else:
+                    r = []
+                    for j, s in self.history.items():
+                        if s['state'] == "checked":
+                            r.append(j)
+                    print(*r, sep="\\n")
+
+
+        :param key: str. The added function will be named as ``query_key``
+        :return: None
         """
 
         def f(s):
