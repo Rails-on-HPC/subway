@@ -282,7 +282,19 @@ Since only step 2 do real submission, compared to step 2,4 in DS scheme, that's 
 General workflow for plain C-S
 ---------------------------------
 
+.. figure:: ../static/wf.svg
+    :width: 100%
+    :align: center
+    :alt: alternate text
+    :figclass: align-center
 
+    Workflow for plain submitter(S) and checker(C).
+
+In the above figure, all core methods within :class:`subway.framework.PlainSub` and :class:`subway.framework.PlainChk` are described.
+The user can customize these methods as they like.
+
+Besides submitter and checker in the main loop, one can also add processor before and after the main loop.
+The processor will run all methods of its own from the arguments ``pipeline``. Eg, see :class:`subway.framework.PreProcessor`
 
 
 Exceptions
