@@ -1,0 +1,11 @@
+name: tests in docker
+on: [push, pull_request]
+jobs:
+  docker-tests:
+    runs-on: ubuntu-18.04
+    name: slurm-docker
+    steps:
+      - uses: actions/checkout@v2
+      - name: run-test
+        run: |
+          bash run-test.sh
