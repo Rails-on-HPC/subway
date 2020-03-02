@@ -128,7 +128,7 @@ def statement_parser(st):
     :param st: str.
     :return: Dict[str, Tuple[str, Any]].
     """
-    l = re.split("[;\s]", st)
+    l = re.split(r"[;\s]", st)
     r = {}
     pattern = re.compile(r"[^=><]*([=><]{1,2})[^=><]*")
     for s in l:

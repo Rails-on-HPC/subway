@@ -51,6 +51,7 @@ class SlurmValueError(SlurmException):
 
 
 # TODO: more robust interaction with sacct with various possibilities and error cases
+# documentation for sacct: https://slurm.schedmd.com/sacct.html
 class SlurmJob:
     """
     Abstraction for job **submitted** to slurm.
@@ -94,6 +95,26 @@ class SlurmJob:
                     print(e.message, file=sys.stderr)
                     time.sleep(interval)
 
+    def get_jobinfo(self, jobid, tries=6, interval=0.8):
+        """
+        get job info from jobid via sacct query
+
+        :param jobid: str, jobid in slurm system (not jobid in subway which is jobname in slurm!)
+        :param tries: Optional[int]. Default 6. It is worthing noting that query soon after job submitted would meet ilegal line,
+                so repetitive try is necessary.
+        :param interval:  Optional[float]. Default 0.8. Seconds between two tries.
+        :return: Dict. Slurm job info.
+        """
+        for i in range(tries):
+            try:
+                return self._get_jobinfo(jobid)
+            except AssertionError as e:
+                if i == tries - 1:
+                    raise e
+                else:
+                    print("try refetching jobinfo", file=sys.stderr)
+                    time.sleep(interval)
+
     def _get_jobid(self, jobname):
         r = subprocess.run(
             [self.sacct, "--name=%s" % jobname, "--format=JobID%50,Jobname%50"],
@@ -107,7 +128,7 @@ class SlurmJob:
         errmsg = "no job name is %s, you may need wait for a second" % jobname
         raise SlurmException(errmsg, code=98)
 
-    def get_jobinfo(self, jobid):
+    def _get_jobinfo(self, jobid):
         """
         get job relavant info from sacct by jobid
 
@@ -117,21 +138,21 @@ class SlurmJob:
                                 'Start': '2020-02-23T10:05:55', 'End': '2020-02-23T10:06:15',
                                 'Elapsed': '00:00:20', 'NNodes': '1', 'NCPUS': '2'}``
         """
-        # TODO: split sacct result, any number of space is not ok for nodelist "None assigned"
+        # nodelist can be "None assigned"
+        # Timelimit attr can also be problematic in some slurm, the result is nothing
         r = subprocess.run(
             [
                 self.sacct,
                 "-j",
                 jobid,
-                "--format=User%30,JobID%50,Jobname%50,partition%20,state%20,time,start,end,elapsed,nnodes,ncpus",
+                "--format=User%30,JobID%50,Jobname%50,partition%20,state%20,time,start,end,elapsed,nnodes,ncpus,nodelist",
+                "-P",  # that is the key point for accurate parsing!
             ],
             stdout=subprocess.PIPE,
         )
         rl = r.stdout.decode("utf-8").split("\n")
-        rl = [rl[0], rl[2]]
-        rll = [
-            [s.strip() for s in l.split(" ") if s.strip()] for l in rl
-        ]  # split using any space is nonsatisfied with nodelist
+        rl = rl[:2]
+        rll = [[s.strip() for s in l.split("|") if s.strip()] for l in rl]
 
         assert len(rll[0]) == len(rll[1])
         info = {}

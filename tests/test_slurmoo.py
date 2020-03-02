@@ -8,6 +8,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from subway.components import SlurmJob, SlurmTask
 
+
 jobname = str(uuid1())
 
 
@@ -21,6 +22,22 @@ def test_task():
     t.submit()
     print(t.jobid())
     time.sleep(3)
+    t.delete(include_output=True)
+
+
+@pytest.mark.slurm
+def test_failed_task():
+    wjobname = str(uuid1())
+    t = SlurmTask(
+        sbatch_path=os.path.join(os.path.dirname(__file__), "test_subway2.sh"),
+        sbatch_commands=["something wrong"],
+        sbatch_options=["-N 1", "--job-name %s" % wjobname],
+    )
+    t.submit()
+    jid = t.jobid()
+    time.sleep(3)
+    j = SlurmJob(jobid=jid)
+    assert j.jobinfo["State"] == "FAILED"
     t.delete(include_output=True)
 
 

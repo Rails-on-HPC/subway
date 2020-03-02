@@ -8,9 +8,9 @@ Install subway in one of the following approaches
 
 - ``pip install hpcsubway``
 
-- ``git clone . https://github.com/Rails-on-HPC/subway.git && python setup.py install``
+- ``git clone https://github.com/Rails-on-HPC/subway.git . && python setup.py install``
 
-- ``git clone . https://github.com/Rails-on-HPC/subway.git && export $SUBWAY_PATH=$(pwd)/bin``
+- ``git clone https://github.com/Rails-on-HPC/subway.git . && export $SUBWAY_PATH=$(pwd)/bin``
 
 
 For the third approach, you don't need to install things at all,

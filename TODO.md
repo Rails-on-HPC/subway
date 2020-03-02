@@ -12,6 +12,7 @@
 - [ ] more neat exception hierachy and error code assignment
 - [ ] more on fault tolerance and compatible beyond check_, (eg, resolve_)
 - [ ] make slurmoo component more general and robust
+- [ ] plugins support linux background job
 
 ## Small tweaks
 - [x] absorted state and absorting_ts for tasks in history.json
