@@ -20,7 +20,7 @@ from subway.framework import PreProcessor
 
 
 if __name__ == "__main__":
-    main_rt({_chk}(params=[[3, 0.9], [2, 0.6]], _py="{_py}", _from="{_from}"),
+    main_rt({_chk}(params=[[3, 0.9], [2, 0.8]], _py="{_py}", _from="{_from}"),
             {_sub}(_py="{_py}"),
             preprocessor=PreProcessor(pipeline=["version_check", "conf_update"]),
             sleep_interval=5)

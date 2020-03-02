@@ -152,7 +152,7 @@ class SlurmJob:
         )
         rl = r.stdout.decode("utf-8").split("\n")
         rl = rl[:2]
-        rll = [[s.strip() for s in l.split("|") if s.strip()] for l in rl]
+        rll = [[s.strip() for s in l.split("|")] for l in rl]
 
         assert len(rll[0]) == len(rll[1])
         info = {}

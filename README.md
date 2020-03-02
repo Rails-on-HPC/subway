@@ -50,3 +50,9 @@ pytest
 # or if you have slurm installed
 pytest --slurm
 ```
+
+You can also test full sets in docker if you don't have slurm configured
+
+```bash
+bash run-test.sh
+```
