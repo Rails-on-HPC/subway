@@ -1,5 +1,9 @@
+"""
+basic slurm plugin with some improvement on bool and time relevant methods.
+"""
+
 from ..framework import PlainChk, PlainSub
-from subway.components import SlurmJob
+from ..components import SlurmJob
 from ..config import history
 from ..utils import now_ts
 from ..components.slurmoo import slurm_abnormal_states
@@ -8,10 +12,10 @@ from ..components.slurmoo import slurm_abnormal_states
 class SlurmChk(PlainChk):
     def is_finished(self, jobid):
         """
-        This utils is to further distinguish those tasks that has incomplete outfile while still running
+        Determine job states based on sacct of main job.
 
-        :param jobid: relativepath
-        :return:
+        :param jobid: str.
+        :return: bool.
         """
         sjob = SlurmJob(jobname=jobid)
         ifn = sjob.jobinfo["State"] == "COMPLETED"
@@ -21,6 +25,12 @@ class SlurmChk(PlainChk):
         return False
 
     def is_aborted(self, jobid):
+        """
+        Determine job states based on sacct of main job.
+
+        :param jobid: str.
+        :return: bool.
+        """
         sjob = SlurmJob(jobname=jobid)
         if sjob.jobinfo["State"] in slurm_abnormal_states:
             history[jobid]["reason"] = sjob.jobinfo["State"]
@@ -28,6 +38,13 @@ class SlurmChk(PlainChk):
         return False
 
     def is_checked(self, jobid):
+        """
+        For DS scheme, judge based on slurm job state of check job.
+        For SS scheme, always return True.
+
+        :param jobid: str.
+        :return: bool.
+        """
         jid = getattr(history[jobid], "assoc", "")  # jobname for associate check job
         if jid:
             sjob = SlurmJob(jobname=jid)
@@ -36,6 +53,13 @@ class SlurmChk(PlainChk):
         return True
 
     def is_frustrated(self, jobid):
+        """
+        For DS scheme, judge based on slurm job state of check job.
+        For SS scheme, always return False.
+
+        :param jobid: str.
+        :return: bool.
+        """
         jid = getattr(history[jobid], "assoc", "")  # jobname for associate check job
         if jid:
             sjob = SlurmJob(jobname=jid)
@@ -54,10 +78,10 @@ class SlurmChk(PlainChk):
 
     def finishing_time(self, jobid):
         """
+        get finish time from sacct.
 
-
-        :param jobid:
-        :return:
+        :param jobid: str.
+        :return: float, timestamp.
         """
         sjob = SlurmJob(jobname=jobid)
 
@@ -65,10 +89,11 @@ class SlurmChk(PlainChk):
 
     def ending_time(self, jobid):
         """
-        ending_time is reponsible for 4 states: checked resolved frustrated failed
+        For DS scheme, return finish time of check slurm job.
+        For SS scheme, simply return now.
 
-        :param jobid:
-        :return:
+        :param jobid: str.
+        :return: float, timestamp.
         """
         jid = getattr(history[jobid], "assoc", "")  # jobname for associate check job
         if jid:

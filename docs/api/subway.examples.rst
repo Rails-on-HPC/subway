@@ -21,6 +21,14 @@ subway.examples.rglocal module
     :undoc-members:
     :show-inheritance:
 
+subway.examples.rgnh module
+------------------------------
+
+.. automodule:: subway.examples.rgnh
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 subway.examples.rgslurm module
 ------------------------------
 

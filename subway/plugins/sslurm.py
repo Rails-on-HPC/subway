@@ -3,6 +3,7 @@ More specific slurm plugin for checker and submitter,
 Extra S is for specific or single (indicates that check job not go through slurm)
 
 """
+
 import os
 from abc import abstractmethod
 
@@ -15,6 +16,10 @@ from ..components.genfiles import generate_file
 
 
 class SSlurmSub(SlurmSub):
+    """
+    Slurm checker with SS scheme.
+    """
+
     def submit_pending(self, jobid):
         sbatch_path = os.path.join(conf["inputs_abs_dir"], jobid + ".sh")
         t = SlurmTask(sbatch_path=sbatch_path)
@@ -24,16 +29,13 @@ class SSlurmSub(SlurmSub):
 
 class SSlurmChk(SlurmChk, PlainRenderer):
     """
-    For subclass to be usable, one need to define methods including:
-    _render_input, _render_commands, _render_options_append (if needed)
-    _render_resource (default {}, if needed), _render_newid (default uuid4, if needed)
-    and specifically check_checking_main
+    Slurm submitter with SS scheme and PlainRender mixin.
     """
 
     def __init__(self, params=None, _from="conf", **kwargs):
         """
 
-        :param params:
+        :param params: List[Dict, List].
         :param _from: str. conf, template.
         :param kwargs:
         """
@@ -101,8 +103,8 @@ class SSlurmChk(SlurmChk, PlainRenderer):
     def _substitue_opts(self, opts, jobid, checkid="", param=None):
         """
 
-        :param opts: lits of strings
-        :return:
+        :param opts: List[str].
+        :return: List[str].
         """
         info_dict = flatten_dict(
             {"conf": conf, "param": param, "jobid": jobid, "checkid": checkid,}
@@ -120,8 +122,8 @@ class SSlurmChk(SlurmChk, PlainRenderer):
     def check_checking_main(self, jobid):
         """
 
-        :param jobid:
-        :return: list of param for new jobs
+        :param jobid: str.
+        :return: List[Tuple[str, Dict[str, Any]]].
         """
         return []
 

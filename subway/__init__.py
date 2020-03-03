@@ -1,3 +1,7 @@
+"""
+__init__.py for subway
+"""
+
 __version__ = (0, 0, 2)
 version = ".".join([str(n) for n in __version__])
 __title__ = 'subway'

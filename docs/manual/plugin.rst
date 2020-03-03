@@ -1,6 +1,25 @@
 Plugins
 ========
 
+Plain Renderer
+---------------
+
+Renderer is a type of mixin for checker class, which provide several ``_render_*`` methods.
+These utilities are designed for rendering of input files and resource dict.
+
+The main entrance is ``_render_check``.
+
+
+Nohup
+---------
+
+The nohup like plugins are :class:`subway.plugins.nohup.NHSSub` and :class:`subway.plugins.nohup.NHSChk`.
+
+It is worth noting, the implementation doesn't actually use ``nohup``, instead it directly use ``subprocess.Popen``
+in python builtin which is non-blocking by default.
+
+
+
 Slurm
 ---------
 

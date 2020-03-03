@@ -21,6 +21,22 @@ subway.plugins.dslurm module
     :undoc-members:
     :show-inheritance:
 
+subway.plugins.nohup module
+----------------------------
+
+.. automodule:: subway.plugins.nohup
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+subway.plugins.renderer module
+-------------------------------
+
+.. automodule:: subway.plugins.renderer
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 subway.plugins.slurm module
 ---------------------------
 

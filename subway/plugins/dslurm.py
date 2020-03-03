@@ -11,6 +11,10 @@ from .sslurm import SSlurmSub, SSlurmChk
 
 
 class DSlurmSub(SSlurmSub):
+    """
+    Slurm submitter for DS scheme.
+    """
+
     def submit_aborted(self, jobid):
         sbatch_path = os.path.join(
             conf["work_dir"], conf["check_inputs_dir"], history[jobid]["assoc"] + ".sh"
@@ -24,10 +28,7 @@ class DSlurmSub(SSlurmSub):
 
 class DSlurmChk(SSlurmChk):
     """
-    For subclass to be usable, one need to define methods including:
-    _render_input, _render_commands, _render_options_append (if needed)
-    _render_resource (default {}, if needed), _render_newid (default uuid1, if needed)
-    and specifically check_checking_main
+    Slurm checker for DS scheme.
     """
 
     def check_finished(self, jobid):  # should generate check input and check sbatch

@@ -574,9 +574,11 @@ class PreProcessor(Processor):
                 nhash = md5file(f)
                 ohash = conf["hashing"].get(p[0], {}).get(p[1])
                 if ohash:
-                    assert (
-                        nhash == ohash
-                    )  # TODO: the exception is to be wrapped in a better presentation
+                    assert nhash == ohash, (
+                        "the binary %s has been changed, please edit a new version in config.json"
+                        % f
+                    )
+                # TODO: the exception is to be wrapped in a better presentation
                 conf["hashing"][p[0]][p[1]] = nhash
 
     @staticmethod

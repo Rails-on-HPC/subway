@@ -1,3 +1,7 @@
+"""
+Lower level abstraction of slurm from CLI interaction.
+"""
+
 # avoid using pyslurm as it is an external dependence and is not portable as well
 
 import os

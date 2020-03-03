@@ -1,3 +1,9 @@
+"""
+debug for plain submitter and checker
+"""
+
+from uuid import uuid4
+
 from ..framework import PlainChk, PlainSub
 
 
@@ -6,12 +12,10 @@ class DebugChk(PlainChk):
         self.is_next = is_next
         super().__init__(params=params, **kwargs)
 
-    def check_checking(self, outputpath):
-        print("the output path to be checked is %s" % outputpath)
+    def check_checking(self, jobid):
+        print("the output path to be checked is %s" % jobid)
         if self.is_next is True:
-            from uuid import uuid1
-
-            return [(str(uuid1()), {"core": 2})]
+            return [(str(uuid4()), {"core": 2})]
         return []
 
 
