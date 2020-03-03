@@ -28,5 +28,6 @@
   ],
   "slurm_template": "sbatch.template",
   "check_slurm_template": "check_sbatch.template",
-  "input_template": "input.template"
+  "input_template": "input.template",
+  "nohup_command": "{conf~_py} {conf~work_dir}/{conf~executable} {conf~inputs_abs_dir}/{jobid} {conf~outputs_abs_dir}/{jobid}"
 }

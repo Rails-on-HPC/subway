@@ -611,6 +611,36 @@ class SubwayCLI:
                     var_dict,
                 )
                 self._render_run_check("rg_run.py")
+
+            elif self.args.action == "rgn":
+                conf = load_json(
+                    os.path.join(
+                        self._subway_path, "examples", "miscs", "rg_config.json"
+                    )
+                )
+                conf["_py"] = sys.executable
+                env_init(self.args.dir, conf, include_main=False)
+                var_dict = {
+                    "_py": sys.executable,
+                    "_sub": "RgNSub",
+                    "_chk": "RgNChk",
+                    "_from": self.args._from,
+                }
+                simple_template_render(
+                    os.path.join(
+                        self._subway_path, "examples", "miscs", "rg_main.template"
+                    ),
+                    os.path.join(self.args.dir, conf.get("entry_point", "main.py")),
+                    var_dict,
+                )
+                self._render_run_check("rg_run.py")
+                shutil.copy(
+                    os.path.join(
+                        self._subway_path, "examples", "miscs", "rg_input.template"
+                    ),
+                    os.path.join(self.args.dir, "input.template"),
+                )
+
             os.chmod(
                 os.path.join(self.args.dir, conf.get("entry_point", "main.py")), 0o700
             )

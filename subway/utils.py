@@ -13,6 +13,17 @@ from functools import partial
 from datetime import datetime
 
 
+def _transform_json(obj):
+    """
+    default function for json.dump
+
+    :param obj: Object, to be serialized
+    :return: Any.
+    """
+    if isinstance(obj, subprocess.Popen):
+        return obj.pid
+
+
 def now_ts():
     """
     get timestamps of now

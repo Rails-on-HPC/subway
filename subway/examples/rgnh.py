@@ -1,14 +1,13 @@
 import os
-
-from ..plugins import SSlurmChk, SSlurmSub
+from ..plugins import NHSChk, NHSSub
 from ..config import conf
 
 
-class RgSSub(SSlurmSub):
+class RgNSub(NHSSub):
     pass
 
 
-class RgSChk(SSlurmChk):
+class RgNChk(NHSChk):
     def check_checking_main(self, jobid):
         with open(os.path.join(conf["inputs_abs_dir"], jobid), "r") as f:
             L, l = f.readlines()

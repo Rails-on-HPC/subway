@@ -47,6 +47,7 @@ class PlainRenderer:
     def _render_resource(self, jobid, checkid="", param=None, prefix=""):
         res = {}
         res["job_count"] = 1
+        res["param"] = param
         return res
 
     def _render_newid(self):

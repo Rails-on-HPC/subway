@@ -5,7 +5,7 @@ import config from ``config.json``
 import os
 import json
 from .cons import work_dir
-from .utils import load_json
+from .utils import load_json, _transform_json
 
 
 config_path = os.path.join(work_dir, ".subway", "config.json")
@@ -37,7 +37,7 @@ def update_history():
     :return: None.
     """
     with open(conf["history_path"], "w") as f:
-        json.dump(history, f, indent=2)
+        json.dump(history, f, indent=2, default=_transform_json)
 
 
 def update_conf():

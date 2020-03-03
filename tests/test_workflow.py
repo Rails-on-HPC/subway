@@ -36,3 +36,17 @@ def test_rgl(tmpdir):
     SubwayCLI(_argv=argv4)()
     argv5 = ["-d", tmpdir, "query", "-s", "state<>checked"]
     SubwayCLI(_argv=argv5)()
+
+
+@pytest.mark.long
+def test_rgn(tmpdir):
+    argv = ["-d", tmpdir, "debug", "setup", "rgn"]
+    SubwayCLI(_argv=argv)()
+    argv2 = ["-d", tmpdir, "r"]
+    SubwayCLI(_argv=argv2)()
+    argv3 = ["-d", tmpdir, "q", "t"]
+    SubwayCLI(_argv=argv3)()
+    argv4 = ["-d", tmpdir, "c", "show"]
+    SubwayCLI(_argv=argv4)()
+    argv5 = ["-d", tmpdir, "query", "-s", "state<>checked"]
+    SubwayCLI(_argv=argv5)()
