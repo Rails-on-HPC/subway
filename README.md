@@ -1,6 +1,6 @@
 ![SUBWAY](docs/static/subway.jpg)
 
-<h2 align="center">SUBWAY:SUBmit jobs in your own WAY</h2>
+<h2 align="center">SUBWAY: SUBmit jobs in your own WAY</h2>
 
 <p align="center">
 <a href="https://github.com/Rails-on-HPC/subway/actions"><img alt="Actions Status" src="https://github.com/Rails-on-HPC/subway/workflows/tests/badge.svg"></a>
