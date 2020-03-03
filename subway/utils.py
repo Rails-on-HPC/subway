@@ -315,5 +315,6 @@ def editor(path, **kwargs):
     # Fail if nothing could be found
     print(
         "No text editor found! Please set the VISUAL and/or EDITOR "
-        "environment variable(s) to your preferred text editor."
+        "environment variable(s) to your preferred text editor.",
+        file=sys.stderr,
     )

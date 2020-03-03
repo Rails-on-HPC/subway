@@ -5,6 +5,7 @@
 <p align="center">
 <a href="https://github.com/Rails-on-HPC/subway/actions"><img alt="Actions Status" src="https://github.com/Rails-on-HPC/subway/workflows/tests/badge.svg"></a>
 <a href="https://subway.readthedocs.io"><img alt="Documentation Status" src="https://readthedocs.org/projects/subway/badge/?version=latest"></a>
+<a href="https://codecov.io/gh/Rails-on-HPC/subway/"><img alt="Code Coverage" src="https://codecov.io/gh/Rails-on-HPC/subway/branch/master/graph/badge.svg"></a>
 </p>
 
 

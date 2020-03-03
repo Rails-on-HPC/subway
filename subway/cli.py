@@ -25,7 +25,7 @@ from . import version
 
 
 class SubwayCLI:
-    def __init__(self, _argv=None):
+    def __init__(self, _argv=None, _test=False):
         parser = argparse.ArgumentParser(description="subway is comming...")
         parser.add_argument(
             "-d", "--directory", dest="dir", default=os.getcwd(), help="project dir"
@@ -82,6 +82,7 @@ class SubwayCLI:
         self.parser = parser
         if not _argv:
             _argv = sys.argv[1:]
+        self._test = _test
         self.args = parser.parse_args(_argv)
         # print(_argv, self.args)
         self.tree = None
@@ -152,7 +153,10 @@ class SubwayCLI:
             getattr(self, self.args.command, "help")()
         except CLIException as e:
             print(e.message, file=sys.stderr)
-            exit(e.code)
+            if not self._test:
+                exit(e.code)
+            else:
+                return e.code
 
     def init(self):
         if self.args.conf is not None:

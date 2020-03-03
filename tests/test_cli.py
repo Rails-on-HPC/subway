@@ -9,6 +9,12 @@ from subway.cli import SubwayCLI
 from subway.utils import load_json
 
 
+def test_version():
+    argv = ["-V"]
+    cl = SubwayCLI(_argv=argv)
+    cl()
+
+
 def test_config(capsys):
     argv = ["-d", work_path, "config", "show"]
     cl = SubwayCLI(_argv=argv)
@@ -35,6 +41,13 @@ def test_init(tmpdir):
     cl()
 
 
+def test_initc(tmpdir):
+    config_path = os.path.join(work_path, ".subway", "config.json")
+    argv = ["-d", tmpdir, "init", "-c", config_path]
+    cl = SubwayCLI(_argv=argv)
+    cl()
+
+
 def test_query_root(capsys):
     argv = ["-d", work_path, "query", "root"]
     cl = SubwayCLI(_argv=argv)
@@ -53,6 +66,21 @@ def test_query_leaves(capsys):
         == "14293906-53c8-11ea-b8c1-34363bc66daa\n"
         + "094816fe-53c8-11ea-885f-34363bc66daa\n"
     )
+
+
+def test_query_info():
+    argv = ["-d", work_path, "query", "info"]
+    cl = SubwayCLI(_argv=argv)
+    cl()
+    argv2 = ["-d", work_path, "query", "-j", "14293906", "i"]
+    cl = SubwayCLI(_argv=argv2, _test=True)
+    assert cl() == 10
+    argv3 = ["-d", work_path, "query", "-j", "14293906", "checking_time"]
+    cl = SubwayCLI(_argv=argv3, _test=True)
+    cl()
+    argv4 = ["-d", work_path, "query", "assoc"]
+    cl = SubwayCLI(_argv=argv4, _test=True)
+    assert cl() == 12
 
 
 def test_query_condition(capsys):

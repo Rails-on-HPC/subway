@@ -11,6 +11,7 @@ from subway.utils import (
     statement_parser,
     md5file,
     flatten_dict,
+    editor,
 )
 
 
@@ -88,3 +89,12 @@ def test_flatten_dict():
         "d~list_2~list_0": 3,
         "d~list_2~list_1": 4,
     }
+
+
+def _run(name):
+    if name[0].endswith("vim"):
+        raise OSError("no vim found")
+
+
+def test_editor():
+    editor(os.path.join(os.path.dirname(__file__), ".subway", "config.json"), _run=_run)
