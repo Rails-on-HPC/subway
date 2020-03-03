@@ -1,10 +1,11 @@
-SUBWAY
-========
+![SUBWAY](docs/static/subway.jpg)
 
-SUBmit jobs in your own WAY.
+<h2 align="center">SUBWAY:SUBmit jobs in your own WAY</h2>
 
-![Github Action](https://github.com/Rails-on-HPC/subway/workflows/tests/badge.svg)
-[![Documentation Status](https://readthedocs.org/projects/subway/badge/?version=latest)](https://subway.readthedocs.io/en/latest/?badge=latest)
+<p align="center">
+<a href="https://github.com/Rails-on-HPC/subway/actions"><img alt="Actions Status" src="https://github.com/Rails-on-HPC/subway/workflows/tests/badge.svg"></a>
+<a href="https://subway.readthedocs.io"><img alt="Documentation Status" src="https://readthedocs.org/projects/subway/badge/?version=latest"></a>
+</p>
 
 
 ## Install
