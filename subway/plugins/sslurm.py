@@ -5,9 +5,8 @@ Extra S is for specific or single (indicates that check job not go through slurm
 """
 import os
 from abc import abstractmethod
-from uuid import uuid4
-from functools import partial
 
+from .renderer import PlainRenderer
 from ..config import conf, history
 from ..components import SlurmJob, SlurmTask
 from ..utils import flatten_dict
@@ -23,11 +22,11 @@ class SSlurmSub(SlurmSub):
         # print(t.jobid())
 
 
-class SSlurmChk(SlurmChk):
+class SSlurmChk(SlurmChk, PlainRenderer):
     """
     For subclass to be usable, one need to define methods including:
     _render_input, _render_commands, _render_options_append (if needed)
-    _render_resource (default {}, if needed), _render_newid (default uuid1, if needed)
+    _render_resource (default {}, if needed), _render_newid (default uuid4, if needed)
     and specifically check_checking_main
     """
 
@@ -52,27 +51,8 @@ class SSlurmChk(SlurmChk):
         :param param: Unoin[Dict, List, Tuple].
         :return: None.
         """
-        info_dict = flatten_dict(
-            {"conf": conf, "param": param, "jobid": jobid, "checkid": checkid,}
-        )
-        if not prefix:
-            if conf.get("input_template"):
-                generate_file(
-                    data=flatten_dict(info_dict),
-                    output_path=os.path.join(conf["inputs_abs_dir"], jobid),
-                    output_template=os.path.join(
-                        conf["work_dir"], conf["input_template"]
-                    ),
-                )
-        elif prefix == "check_":
-            if conf.get(prefix + "input_template"):
-                generate_file(
-                    data=flatten_dict(info_dict),
-                    output_path=os.path.join(conf[prefix + "inputs_abs_dir"], checkid),
-                    output_template=os.path.join(
-                        conf["work_dir"], conf[prefix + "input_template"]
-                    ),
-                )
+        super()._render_input(jobid=jobid, checkid=checkid, param=param, prefix=prefix)
+        self._render_sbatch(jobid=jobid, checkid=checkid, param=param, prefix=prefix)
 
     def _render_sbatch(self, jobid, checkid="", param=None, prefix=""):
         if not prefix:
@@ -118,32 +98,6 @@ class SSlurmChk(SlurmChk):
             opts=commands, jobid=jobid, checkid=checkid, param=param
         )
 
-    # def _replace_func(self, jobid, checkid, char):
-    #     # a second thought: why not unify with {} as format
-    #     if char == "j":
-    #         return jobid
-    #     elif char == "J":
-    #         return checkid
-    #     elif char == "i":
-    #         return os.path.join(conf.get("inputs_abs_dir", ""), jobid)
-    #     elif char == "o":
-    #         return os.path.join(conf.get("outputs_abs_dir", ""), jobid)
-    #     elif char == "I":
-    #         return os.path.join(conf.get("check_inputs_abs_dir", ""), checkid)
-    #     elif char == "O":
-    #         return os.path.join(conf.get("check_outputs_abs_dir", ""), checkid)
-    #     elif char == "e":
-    #         return os.path.join(conf["work_dir"], conf.get("executable", ""))
-    #     elif char == "E":
-    #         return os.path.join(conf["work_dir"], conf.get("check_executable", ""))
-    #     elif char == "v":
-    #         return conf.get("executable_version", "")
-    #     elif char == "V":
-    #         return conf.get("check_executable_version", "")
-    #     elif char == "w":
-    #         return conf.get("work_dir", "")
-    #     return ""
-
     def _substitue_opts(self, opts, jobid, checkid="", param=None):
         """
 
@@ -158,23 +112,6 @@ class SSlurmChk(SlurmChk):
             opts[i] = opt.format(**info_dict)  # sep="." doesn't work here
         # f-sring is way better for {a[b]} support naturally, but considering py3.5 here...
         return opts
-
-    def _render_resource(self, jobid, checkid="", param=None):
-        res = {}
-        res["job_count"] = 1
-        return res
-
-    def _render_check(self, params):
-        r = []
-        for param in params:
-            jobid = self._render_newid()
-            self._render_input(jobid=jobid, param=param)
-            self._render_sbatch(jobid=jobid, param=param)
-            r.append((jobid, self._render_resource(jobid=jobid, param=param)))
-        return r
-
-    def _render_newid(self):
-        return str(uuid4())
 
     def check_kickstart(self):
         return self._render_check(self.params)

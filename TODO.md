@@ -7,11 +7,11 @@
 - [ ] manuals for cli
 - [ ] more sophisticated print or logger system
 - [x] increase task coverage for future CI and collaboration
-- [ ] CI slurm setup
+- [x] CI slurm setup
 - [x] add pre and post hooks for main
 - [ ] more neat exception hierachy and error code assignment
 - [ ] more on fault tolerance and compatible beyond check_, (eg, resolve_)
-- [ ] make slurmoo component more general and robust
+- [x] make slurmoo component more general and robust
 - [ ] plugins support linux background job
 
 ## Small tweaks
@@ -20,7 +20,7 @@
 - [x] strict version fix checking by hashing the file
 - [x] default job_count limitation (one line impl in sslurm)
 - [x] add option on sslurm plugin for directly rendering files ``_from="template"``
-- [ ] node list tracking for slurmoo
+- [x] node list tracking for slurmoo
 
 ## Thoughts and discussions
 

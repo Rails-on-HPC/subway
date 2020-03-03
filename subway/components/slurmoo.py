@@ -74,12 +74,12 @@ class SlurmJob:
         self.jobinfo = self.get_jobinfo(self.jobid)
         self.jobname = self.jobinfo["JobName"]
 
-    def get_jobid(self, jobname, tries=6, interval=0.8):
+    def get_jobid(self, jobname, tries=10, interval=0.8):
         """
         get jobid from jobname via sacct query
 
         :param jobname: str.
-        :param tries: Optional[int]. Default 6. It is worthing noting that query soon after job submitted would meet empty line,
+        :param tries: Optional[int]. Default 10. It is worthing noting that query soon after job submitted would meet empty line,
                 so repetitive try is necessary.
         :param interval: Optional[float]. Default 0.8. Seconds between two tries.
         :return: str. jobid.
@@ -95,12 +95,12 @@ class SlurmJob:
                     print(e.message, file=sys.stderr)
                     time.sleep(interval)
 
-    def get_jobinfo(self, jobid, tries=6, interval=0.8):
+    def get_jobinfo(self, jobid, tries=10, interval=0.8):
         """
         get job info from jobid via sacct query
 
         :param jobid: str, jobid in slurm system (not jobid in subway which is jobname in slurm!)
-        :param tries: Optional[int]. Default 6. It is worthing noting that query soon after job submitted would meet ilegal line,
+        :param tries: Optional[int]. Default 10. It is worthing noting that query soon after job submitted would meet ilegal line,
                 so repetitive try is necessary.
         :param interval:  Optional[float]. Default 0.8. Seconds between two tries.
         :return: Dict. Slurm job info.
