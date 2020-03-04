@@ -7,6 +7,7 @@ import os
 import sys
 import json
 import shutil
+import subprocess
 from functools import partial
 from datetime import datetime
 
@@ -20,7 +21,7 @@ from .utils import (
     statement_parser,
 )
 from .htree import HTree
-from .exceptions import CLIException, NoAttribute
+from .exceptions import CLIException, NoAttribute, TestBubble
 from . import version
 
 
@@ -176,7 +177,14 @@ class SubwayCLI:
     def run(self):
 
         executer = self.conf.get("entry_point", "main.py")
-        os.system(os.path.join(self.dir, executer))
+        r = subprocess.run(
+            os.path.join(self.dir, executer),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        if self._test:
+            if r.returncode != 0:
+                raise TestBubble("entry point return with error")
 
     r = run
 
@@ -482,37 +490,12 @@ class SubwayCLI:
         with open(os.path.join(self.args.dir, ".subway", "history.json"), "w") as f:
             json.dump({}, f)
 
-    def _render_run_check(self, runpath, checkpath=None, subwaypath=None):
-        """
-
-        :param runpath: relative path (only file name)
-        :param checkpath:
-        :param subwaypath: dir path for subway lib
-        :return:
-        """
-        if not subwaypath:
-            subwaypath = self._subway_path
-        if checkpath:
-            shutil.copyfile(
-                os.path.join(subwaypath, "examples", "miscs", checkpath),
-                os.path.join(self.args.dir, "check.py"),
-            )
-        shutil.copyfile(
-            os.path.join(subwaypath, "examples", "miscs", runpath),
-            os.path.join(self.args.dir, "run.py"),
-        )
-
-    def _render_sbatch_template(self, mainpath, checkpath=None, subwaypath=None):
-        if not subwaypath:
-            subwaypath = self._subway_path
-        if checkpath:
-            shutil.copyfile(
-                os.path.join(subwaypath, "examples", "miscs", checkpath),
-                os.path.join(self.args.dir, "check_sbatch.template"),
-            )
-        shutil.copyfile(
-            os.path.join(subwaypath, "examples", "miscs", mainpath),
-            os.path.join(self.args.dir, "sbatch.template"),
+    def _copy_setup(self, fname):
+        aname = fname.split("_")[1:]
+        aname = "_".join(aname)
+        shutil.copy(
+            os.path.join(self._subway_path, "examples", "miscs", fname),
+            os.path.join(self.args.dir, aname),
         )
 
     def debug(self):
@@ -559,16 +542,14 @@ class SubwayCLI:
                     os.path.join(self.args.dir, conf.get("entry_point", "main.py")),
                     var_dict,
                 )
-                self._render_run_check("rg_run.py", "rg_check.py")
-                self._render_sbatch_template(
-                    "rg_sbatch.template", "rg_check_sbatch.template"
-                )
-                shutil.copy(
-                    os.path.join(
-                        self._subway_path, "examples", "miscs", "rg_input.template"
-                    ),
-                    os.path.join(self.args.dir, "input.template"),
-                )
+                for f in [
+                    "rg_run.py",
+                    "rg_check.py",
+                    "rg_sbatch.template",
+                    "rg_check_sbatch.template",
+                    "rg_input.template",
+                ]:
+                    self._copy_setup(f)
 
             elif self.args.action == "rgs":
                 conf = load_json(
@@ -591,14 +572,12 @@ class SubwayCLI:
                     os.path.join(self.args.dir, conf.get("entry_point", "main.py")),
                     var_dict,
                 )
-                self._render_run_check("rg_run.py")
-                self._render_sbatch_template("rg_sbatch.template")
-                shutil.copy(
-                    os.path.join(
-                        self._subway_path, "examples", "miscs", "rg_input.template"
-                    ),
-                    os.path.join(self.args.dir, "input.template"),
-                )
+                for f in [
+                    "rg_run.py",
+                    "rg_sbatch.template",
+                    "rg_input.template",
+                ]:
+                    self._copy_setup(f)
 
             elif self.args.action == "rgl":
                 conf = load_json(
@@ -621,7 +600,10 @@ class SubwayCLI:
                     os.path.join(self.args.dir, conf.get("entry_point", "main.py")),
                     var_dict,
                 )
-                self._render_run_check("rg_run.py")
+                for f in [
+                    "rg_run.py",
+                ]:
+                    self._copy_setup(f)
 
             elif self.args.action == "rgn":
                 conf = load_json(
@@ -644,13 +626,37 @@ class SubwayCLI:
                     os.path.join(self.args.dir, conf.get("entry_point", "main.py")),
                     var_dict,
                 )
-                self._render_run_check("rg_run.py")
-                shutil.copy(
+                for f in [
+                    "rg_run.py",
+                    "rg_input.template",
+                ]:
+                    self._copy_setup(f)
+
+            elif self.args.action == "pin":
+                conf = load_json(
                     os.path.join(
-                        self._subway_path, "examples", "miscs", "rg_input.template"
-                    ),
-                    os.path.join(self.args.dir, "input.template"),
+                        self._subway_path, "examples", "miscs", "pi_config.json"
+                    )
                 )
+                conf["_py"] = sys.executable
+                env_init(self.args.dir, conf, include_main=False)
+                var_dict = {
+                    "_py": sys.executable,
+                    "_sub": "PiNSub",
+                    "_chk": "PiNChk",
+                }
+                simple_template_render(
+                    os.path.join(
+                        self._subway_path, "examples", "miscs", "pi_main.template"
+                    ),
+                    os.path.join(self.args.dir, conf.get("entry_point", "main.py")),
+                    var_dict,
+                )
+                for f in [
+                    "pi_run.py",
+                    "pi_input.template",
+                ]:
+                    self._copy_setup(f)
 
             os.chmod(
                 os.path.join(self.args.dir, conf.get("entry_point", "main.py")), 0o700

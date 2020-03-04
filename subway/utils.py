@@ -252,7 +252,7 @@ def which(binary, path=None):
         if os.path.isfile(exe) and os.access(exe, os.X_OK):
             return exe
 
-    return None
+    return ""
 
 
 def editor(path, **kwargs):

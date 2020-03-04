@@ -124,3 +124,6 @@ class NHSSub(PlainSub):
         )
         history[jobid]["pid"] = r.pid
         history[jobid]["popen"] = r
+
+
+# TODO: DS scheme NH class

@@ -1,0 +1,28 @@
+#! {_py}
+
+import os
+
+binpath = os.environ.get("SUBWAY_PATH")
+
+if binpath:
+    import sys
+    sys.path.insert(0, os.path.dirname(binpath))
+
+from subway import cons
+
+cons.work_dir = os.path.dirname(os.path.abspath(__file__))
+
+from subway.workflow import main_once, main_rt
+
+from subway.examples import {_sub}, {_chk}
+
+
+if __name__ == "__main__":
+    main_rt({_chk}(params=[[2000]]),
+            {_sub}(),
+            sleep_interval=3.9)
+
+
+# _py = current python executable
+# _sub = submitter class
+# _chk = checker class

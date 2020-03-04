@@ -36,3 +36,7 @@ class NoAttribute(CLIException):
 
 class EndingBubble(SubwayException):
     pass
+
+
+class TestBubble(SubwayException):
+    pass

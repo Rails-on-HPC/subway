@@ -1,0 +1,12 @@
+{
+  "inputs_dir":"inputs",
+  "outputs_dir":"outputs",
+  "resource_limit":{
+
+  },
+  "executable":"run.py",
+  "entry_point":"main.py",
+  "executable_version":"0.1.0",
+  "input_template": "input.template",
+  "nohup_command": "{conf~_py} {conf~work_dir}/{conf~executable} {conf~inputs_abs_dir}/{jobid} {conf~outputs_abs_dir}/{jobid}"
+}
