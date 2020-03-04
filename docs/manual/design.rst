@@ -105,7 +105,7 @@ finds jobs whose prev attr is either 1 or 2. On the other hand ``subway q -s nex
 
 Subway will detect jobs satisfy all conditions at the same time. The attributes are with the same name as in ``history.json``.
 The higher order attributes can be accessed with "." notation. For example, to query ``cpu_count`` in ``resource``, we can
-use ``subway query -s "resource.cpu_count>2"``.
+use ``subway query -s "resource.cpu_count>2"``. For list element, one can treat the key as ``list_0`` and so on.
 
 Beyond these attributes, there are also some special attribute query statement supports. These attrs ends with "_ts" are extended
 to attrs with "_tso" where python datetime object is obtained and can be compared directly in the form as ``checking_tso<datetime(2020,2,2,20,2,20)``.

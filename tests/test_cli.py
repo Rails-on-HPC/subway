@@ -84,7 +84,7 @@ def test_query_info():
 
 
 def test_query_condition(capsys):
-    # caution: tso format is not suitable for test due to timezone issue,
+    # caution: tso format is subtle for test due to timezone issue,
     # may fail in CI with different tz
     argv = [
         "-d",
@@ -124,7 +124,6 @@ def test_query_condition(capsys):
         "-s",
         "resource.cpu_count>1",
     ]
-    # note the single quote ' in the list
     cl = SubwayCLI(_argv=argv4)
     cl()
     captured = capsys.readouterr()
@@ -137,8 +136,20 @@ def test_query_condition(capsys):
         "-s",
         "resource.cpu_count<>1",
     ]
-    # note the single quote ' in the list
     cl = SubwayCLI(_argv=argv5)
     cl()
     captured = capsys.readouterr()
     assert captured.out == "1089b602-53c8-11ea-bf63-34363bc66daa\n"
+
+    argv6 = [
+        "-d",
+        work_path,
+        "q",
+        "-s",
+        "resource.param.list_0=2",
+    ]
+    # get list element with key in the form of list_n
+    cl = SubwayCLI(_argv=argv6)
+    cl()
+    captured = capsys.readouterr()
+    assert captured.out == "4b275a36-53c7-11ea-92bd-34363bc66daa\n"

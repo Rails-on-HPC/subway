@@ -10,6 +10,11 @@ from ..components.slurmoo import slurm_abnormal_states
 
 
 class SlurmChk(PlainChk):
+    """
+    Low level checker for slurm with only some ``is_*`` and ``*_time`` methods redefined.
+    General users are recommended to use :class:`subway.plugins.sslurm.SSlurmChk` instead.
+    """
+
     def is_finished(self, jobid):
         """
         Determine job states based on sacct of main job.
@@ -103,4 +108,8 @@ class SlurmChk(PlainChk):
 
 
 class SlurmSub(PlainSub):
+    """
+    Exactly the same as :class:`subway.framework.PlainSub`.
+    """
+
     pass

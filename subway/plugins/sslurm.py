@@ -21,6 +21,13 @@ class SSlurmSub(SlurmSub):
     """
 
     def submit_pending(self, jobid):
+        """
+        `DIY: not recommend.`
+        Default impl is submitting jobs via sbatch, it is in general good enough.
+
+        :param jobid: str.
+        :return: None.
+        """
         sbatch_path = os.path.join(conf["inputs_abs_dir"], jobid + ".sh")
         t = SlurmTask(sbatch_path=sbatch_path)
         t.submit()
@@ -44,8 +51,9 @@ class SSlurmChk(SlurmChk, PlainRenderer):
 
     def _render_input(self, jobid, checkid="", param=None, prefix=""):
         """
-        generate input files based on jobid and param.
-        The default impl can render param to input.template.
+        `DIY: depends`.
+        Generate input files based on jobid and param.
+        The default impl can render param to input.template and similar to sbatch.template.
         But this is not general enough for all user case,
         the user can simply rewrite this method.
 
@@ -57,6 +65,15 @@ class SSlurmChk(SlurmChk, PlainRenderer):
         self._render_sbatch(jobid=jobid, checkid=checkid, param=param, prefix=prefix)
 
     def _render_sbatch(self, jobid, checkid="", param=None, prefix=""):
+        """
+        render sbatch script from template file or config.json. called from ``_render_input``
+
+        :param jobid: str.
+        :param checkid: Optiona[str].
+        :param param: Union[List, Dict].
+        :param prefix: Optional[str].
+        :return: None.
+        """
         if not prefix:
             _sbatch_path = os.path.join(conf["inputs_abs_dir"], jobid + ".sh")
         elif prefix == "check_":
@@ -102,6 +119,7 @@ class SSlurmChk(SlurmChk, PlainRenderer):
 
     def _substitue_opts(self, opts, jobid, checkid="", param=None):
         """
+        inner function to render slurm commands from templates.
 
         :param opts: List[str].
         :return: List[str].
@@ -116,11 +134,18 @@ class SSlurmChk(SlurmChk, PlainRenderer):
         return opts
 
     def check_kickstart(self):
+        """
+        Directly call ``_render_check(self.params)``.
+
+        :return:
+        """
         return self._render_check(self.params)
 
     @abstractmethod
     def check_checking_main(self, jobid):
         """
+        `DIY: must`.
+        Given jobid of job in state of checking, return params list for new jobs to be run.
 
         :param jobid: str.
         :return: List[Tuple[str, Dict[str, Any]]].
@@ -128,5 +153,11 @@ class SSlurmChk(SlurmChk, PlainRenderer):
         return []
 
     def check_checking(self, jobid):
+        """
+        Call ``check_checking_main`` to get params and then call ``_render_check``.
+
+        :param jobid: str.
+        :return:
+        """
         params = self.check_checking_main(jobid)
         return self._render_check(params)

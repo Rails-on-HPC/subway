@@ -13,7 +13,10 @@ from ..components.genfiles import generate_file
 class PlainRenderer:
     def _render_input(self, jobid, checkid="", param=None, prefix=""):
         """
-        generate input files based on jobid and param.
+        `DIY: depends.`
+        If you try to customize this method,
+        include ``super()._render_input`` is strongly recommended.
+        Generate input files based on jobid and param.
         The default impl can render param to input.template.
         But this is not general enough for all user case,
         the user can simply rewrite this method.
@@ -45,6 +48,17 @@ class PlainRenderer:
                 )
 
     def _render_resource(self, jobid, checkid="", param=None, prefix=""):
+        """
+        `DIY: depends`
+        Default impl adds param and job_count=1 to resource dict.
+        Even if you customize this method, we recommend you add ``super()._render_resource`` in your method.
+
+        :param jobid: str.
+        :param checkid: Optional[str], default "".
+        :param param: Optional[Union[List, Dict]].
+        :param prefix: Optiona[str], default "".
+        :return: Dict, resource dict.
+        """
         res = {}
         res["job_count"] = 1
         res["param"] = param
@@ -52,13 +66,25 @@ class PlainRenderer:
 
     def _render_newid(self):
         """
-        generate new job id
+        `DIY: depends.`
+        generate new job id.
+        In most cases, the default implementation by ``uuid4`` is good enough.
 
         :return: str. jobid
         """
         return str(uuid4())
 
     def _render_check(self, params, jobid=None, _type="main", prefix=""):
+        """
+        `DIY: not recommend.`
+        main entrance to rendered mixin, shall be called in checker class, check_* methods.
+
+        :param params: List[Union[Dict, List]].
+        :param jobid: Optional[str]. Default None for new job render, and jobid is give for assoc job render.
+        :param _type: Optional[str]. Default "main". Current options also include "check".
+        :param prefix: Optional[str]. Default ``""``.
+        :return: List[Tuple[str, Dict[str, Any]]]. List of pairs with jobid and resource dict for new jobs or assoc job.
+        """
         if _type == "main":
             r = []
             for param in params:

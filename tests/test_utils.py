@@ -73,7 +73,7 @@ def test_statement_parser():
 def test_md5file():
     assert (
         md5file(os.path.join(os.path.dirname(__file__), ".subway", "history.json"))
-        == "00957b1f7591c6649f661f28e44aa395"
+        == "ac9501d73459152e7e1c2ce11b6d9a7b"
     )
 
 

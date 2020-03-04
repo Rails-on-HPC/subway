@@ -275,18 +275,25 @@ class SubwayCLI:
         """
         ``_get({"a": {"b":1}}, "a.b") = 1``
 
-        :param s:
-        :param k:
-        :param _default:
+        :param s: Dict.
+        :param k: str. Key string separating with "."
+        :param _default: Any, default return when nothing match. Default value is None.
         :return:
         """
         ks = k.split(".")
         d = s
         for i in ks:
-            if d.get(i):
-                d = d[i]
+            if i.startswith("list_"):
+                try:
+                    ind = int(i[5:])
+                    d = d[ind]
+                except (IndexError, ValueError):
+                    return _default
             else:
-                return _default
+                if d.get(i):
+                    d = d[i]
+                else:
+                    return _default
         return d
 
     @staticmethod

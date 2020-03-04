@@ -6,7 +6,13 @@
 <a href="https://github.com/Rails-on-HPC/subway/actions"><img alt="Actions Status" src="https://github.com/Rails-on-HPC/subway/workflows/tests/badge.svg"></a>
 <a href="https://subway.readthedocs.io"><img alt="Documentation Status" src="https://readthedocs.org/projects/subway/badge/?version=latest"></a>
 <a href="https://codecov.io/gh/Rails-on-HPC/subway/"><img alt="Code Coverage" src="https://codecov.io/gh/Rails-on-HPC/subway/branch/master/graph/badge.svg"></a>
+<a href="https://pypi.org/project/hpcsubway/"><img alt="Pypi version" src="https://img.shields.io/pypi/v/hpcsubway.svg"></a>
 </p>
+
+
+Subway is an HPC job management and automation tool. It is designed for HPC users who are tired of ``sbtach`` again and again or fail to recall the input and binary versions for given output.
+
+By utilizing subway, the whole HPC project running from days to months can be as simple as one liner ``subway run``.
 
 
 ## Install

@@ -13,6 +13,7 @@
 - [ ] more on fault tolerance and compatible beyond check_, (eg, resolve_)
 - [x] make slurmoo component more general and robust
 - [x] plugins support linux background job
+- [ ] powerful report summary within subway query interface
 
 ## Small tweaks
 - [x] absorted state and absorting_ts for tasks in history.json

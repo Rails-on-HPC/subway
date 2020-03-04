@@ -19,12 +19,17 @@ class NHException(SubwayException):
 
 
 class NHSChk(PlainChk, PlainRenderer):
+    """
+    checker using non-blocking subprocess.Popen
+    """
+
     def check_kickstart(self):
         return self._render_check(self.params)
 
     @abstractmethod
     def check_checking_main(self, jobid):
         """
+        `DIY:MUST`.
 
         :param jobid: str.
         :return: List[Union[Dict, List]]. list of param for new jobs
@@ -37,6 +42,8 @@ class NHSChk(PlainChk, PlainRenderer):
 
     def is_finished(self, jobid):
         """
+        Using Popen.poll() to detect whether job is finished.
+        For restarted subway run which lose popen object in the memory, use ps pid instead.
 
         :param jobid: str.
         :return:
@@ -83,7 +90,19 @@ class NHSChk(PlainChk, PlainRenderer):
 
 
 class NHSSub(PlainSub):
+    """
+    submitter using non-blocking subprocess.Popen
+    """
+
     def submit_pending(self, jobid):
+        """
+        `DIY: not recommend.`
+        Already well written, submit with command from ``nohup_command`` in config.json,
+        or from ``command`` argument when initializing the submitter.
+
+        :param jobid: str.
+        :return: None.
+        """
         if self.kws.get("command"):
             command = self.kws["command"]
         elif conf.get("nohup_command"):
